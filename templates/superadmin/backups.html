@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Backups - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Backup & Recovery</h1>
+  <form method="POST" action="{{ url_for('superadmin.run_backup_now', backup_type='manual') }}">
+    <button class="btn btn-pf-accent"><i class="bi bi-cloud-arrow-up"></i> Run Backup Now (All Shops)</button>
+  </form>
+</div>
+
+{% if failed_count %}
+<div class="alert alert-danger">
+  <i class="bi bi-exclamation-triangle"></i> {{ failed_count }} backup(s) have failed historically. Review the log below.
+</div>
+{% endif %}
+
+<div class="row g-3 mb-3">
+  <div class="col-md-4">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-2" style="color:var(--pf-navy);">Shops</h6>
+      <table class="table table-sm mb-0">
+        <tbody>
+          {% for s in shops %}
+          <tr><td>{{ s.name }}</td><td class="text-end"><a href="{{ url_for('superadmin.shop_backups', shop_id=s.id) }}" class="btn btn-sm btn-outline-secondary">Manage</a></td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-md-8">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Recent Backup Runs (all shops)</h6>
+      <table class="table table-pf table-sm">
+        <thead><tr><th>Shop</th><th>Type</th><th>Status</th><th>Size</th><th>Started</th><th></th></tr></thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            <td>{{ log.shop.name if log.shop else 'All' }}</td>
+            <td class="text-capitalize">{{ log.backup_type }}</td>
+            <td><span class="badge {{ 'badge-ok' if log.status == 'success' else 'badge-critical' }}">{{ log.status.title() }}</span></td>
+            <td class="small">{{ '%.1f KB'|format(log.size_bytes / 1024) if log.size_bytes else '-' }}</td>
+            <td class="small">{{ log.started_at.strftime('%d %b %Y %H:%M') }}</td>
+            <td class="text-end">
+              {% if log.status == 'success' %}
+              <form method="POST" action="{{ url_for('superadmin.verify_backup', backup_id=log.id) }}" class="d-inline">
+                <button class="btn btn-sm btn-outline-secondary">Verify</button>
+              </form>
+              {% else %}
+              <span class="small text-danger" title="{{ log.error_message }}">Error</span>
+              {% endif %}
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="6" class="text-center text-muted py-4">No backups have run yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<div class="pf-card">
+  <h6 class="fw-bold mb-2" style="color:var(--pf-navy);">Automatic Schedule</h6>
+  <p class="small text-muted mb-0">
+    Daily at 2:00 AM, weekly on Sundays at 2:30 AM, monthly on the 1st at 3:00 AM (IST) — runs automatically
+    while this app process is alive. For a multi-worker production deployment, disable the in-app scheduler
+    and point an external cron at <code>/internal/run-backup/&lt;type&gt;</code> instead (see README).
+    Retention: last 7 daily, 4 weekly, 12 monthly backups are kept per shop; older ones are deleted automatically.
+  </p>
+</div>
+{% endblock %}

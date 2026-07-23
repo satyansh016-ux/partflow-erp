@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Add Supplier - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Add Supplier</h1></div>
+<div class="pf-card" style="max-width:600px;">
+  <form method="POST">
+    <label class="form-label small fw-semibold">Supplier Name *</label>
+    <input type="text" name="name" class="form-control mb-3" required>
+    <label class="form-label small fw-semibold">Phone</label>
+    <input type="text" name="phone" class="form-control mb-3">
+    <label class="form-label small fw-semibold">Email</label>
+    <input type="email" name="email" class="form-control mb-3">
+    <label class="form-label small fw-semibold">GST Number</label>
+    <input type="text" name="gst_number" class="form-control mb-3">
+    <label class="form-label small fw-semibold">Address</label>
+    <textarea name="address" class="form-control mb-3" rows="2"></textarea>
+    <button class="btn btn-pf-primary">Save Supplier</button>
+    <a href="{{ url_for('owner.suppliers') }}" class="btn btn-outline-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

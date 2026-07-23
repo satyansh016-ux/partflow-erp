@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Shops - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>All Shops</h1>
+  <a href="{{ url_for('superadmin.new_shop') }}" class="btn btn-pf-accent"><i class="bi bi-plus-lg"></i> Add Shop</a>
+</div>
+<div class="pf-card">
+  <table class="table table-pf table-sm align-middle">
+    <thead><tr><th>Shop</th><th>GST No.</th><th>Status</th><th>Created</th><th></th></tr></thead>
+    <tbody>
+      {% for s in shops %}
+      <tr>
+        <td><strong>{{ s.name }}</strong></td><td>{{ s.gst_number or '-' }}</td>
+        <td>
+          <span class="badge {{ 'badge-ok' if s.status == 'active' else 'badge-near-min' if s.status == 'trial' else 'badge-critical' }}">
+            {{ s.status.title() }}
+          </span>
+        </td>
+        <td class="small">{{ s.created_at.strftime('%d %b %Y') }}</td>
+        <td class="text-end"><a href="{{ url_for('superadmin.shop_detail', shop_id=s.id) }}" class="btn btn-sm btn-outline-secondary">Manage</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted py-4">No shops yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

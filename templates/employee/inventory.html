@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as m %}
+{% block title %}Stock Lookup - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Stock Lookup</h1></div>
+<div class="pf-card mb-3">
+  <form class="row g-2" method="GET">
+    <div class="col-md-10"><input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search part name, OEM number, model..."></div>
+    <div class="col-md-2"><button class="btn btn-pf-primary w-100">Search</button></div>
+  </form>
+</div>
+<div class="pf-card">
+  <table class="table table-pf table-sm">
+    <thead><tr><th>Part</th><th>Vehicle</th><th>Stock</th><th>Status</th><th>Price</th><th>Rack</th></tr></thead>
+    <tbody>
+      {% for p in parts %}
+      <tr>
+        <td><strong>{{ p.name }}</strong></td>
+        <td class="small">{{ (p.vehicle_type or '-').replace('_',' ').title() }} {{ p.vehicle_model or '' }}</td>
+        <td>{{ p.current_stock }}</td>
+        <td>{{ m.stock_badge(p.stock_level()) }}</td>
+        <td>Rs. {{ "%.2f"|format(p.selling_price) }}</td>
+        <td class="small">{{ p.rack_location or '-' }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="6" class="text-center text-muted py-4">No parts found.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

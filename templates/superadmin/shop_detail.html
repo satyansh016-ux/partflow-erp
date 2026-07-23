@@ -1,0 +1,120 @@
+{% extends "base.html" %}
+{% block title %}{{ shop.name }} - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>{{ shop.name }}</h1></div>
+
+<div class="row g-3 mb-3">
+  <div class="col-md-3">
+    <div class="pf-card text-center">
+      <span class="text-muted small">Status</span>
+      <div class="fs-5 fw-bold text-capitalize">{{ shop.status }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="pf-card text-center">
+      <span class="text-muted small">Invoices Issued</span>
+      <div class="fs-5 fw-bold">{{ invoice_count }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="pf-card text-center">
+      <span class="text-muted small">Users</span>
+      <div class="fs-5 fw-bold">{{ users|length }}</div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="pf-card text-center">
+      <span class="text-muted small">Distinct Devices (recent)</span>
+      <div class="fs-5 fw-bold {{ 'text-danger' if distinct_device_count > 3 }}">{{ distinct_device_count }}</div>
+    </div>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="pf-card mb-3">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Shop Status</h6>
+      <form method="POST" action="{{ url_for('superadmin.change_shop_status', shop_id=shop.id) }}" class="d-flex gap-2">
+        <select name="status" class="form-select">
+          {% for st in ['trial','active','suspended','banned'] %}
+            <option value="{{ st }}" {{ 'selected' if shop.status == st }}>{{ st.title() }}</option>
+          {% endfor %}
+        </select>
+        <button class="btn btn-pf-primary">Update</button>
+      </form>
+    </div>
+
+    <div class="pf-card mb-3">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Add / Renew Subscription</h6>
+      <form method="POST" action="{{ url_for('superadmin.update_subscription', shop_id=shop.id) }}">
+        <div class="row g-2">
+          <div class="col-4"><input type="text" name="plan_name" class="form-control form-control-sm" placeholder="Plan name" value="Standard"></div>
+          <div class="col-4"><input type="number" step="0.01" name="amount" class="form-control form-control-sm" placeholder="Amount (Rs.)"></div>
+          <div class="col-4"><input type="number" name="duration_days" class="form-control form-control-sm" placeholder="Days" value="30"></div>
+        </div>
+        <button class="btn btn-pf-accent btn-sm mt-2">Activate Subscription</button>
+      </form>
+    </div>
+
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Subscription History</h6>
+      <table class="table table-sm">
+        <thead><tr><th>Plan</th><th>Start</th><th>End</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for sub in subs %}
+          <tr><td>{{ sub.plan_name }}</td><td class="small">{{ sub.start_date }}</td><td class="small">{{ sub.end_date }}</td>
+              <td>Rs. {{ "%.2f"|format(sub.amount) }}</td><td class="text-capitalize">{{ sub.status }}</td></tr>
+          {% else %}
+          <tr><td colspan="5" class="text-center text-muted py-3">No subscriptions yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="col-lg-6">
+    <div class="pf-card mb-3">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Users</h6>
+      <table class="table table-sm">
+        <thead><tr><th>Name</th><th>Email</th><th>Role</th><th></th></tr></thead>
+        <tbody>
+          {% for u in users %}
+          <tr>
+            <td>{{ u.name }}</td><td class="small">{{ u.email }}</td><td class="text-capitalize">{{ u.role.replace('_',' ') }}</td>
+            <td class="text-end">
+              <button class="btn btn-sm btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#resetModal{{ u.id }}">Reset PW</button>
+            </td>
+          </tr>
+          <div class="modal fade" id="resetModal{{ u.id }}" tabindex="-1">
+            <div class="modal-dialog"><div class="modal-content">
+              <form method="POST" action="{{ url_for('superadmin.reset_password', user_id=u.id) }}">
+                <div class="modal-header"><h6 class="modal-title">Reset password for {{ u.email }}</h6><button type="button" class="btn-close" data-bs-dismiss="modal"></button></div>
+                <div class="modal-body"><input type="password" name="new_password" class="form-control" placeholder="New password (min 8 chars)" minlength="8" required></div>
+                <div class="modal-footer"><button class="btn btn-pf-primary">Reset</button></div>
+              </form>
+            </div></div>
+          </div>
+          {% else %}
+          <tr><td colspan="4" class="text-center text-muted py-3">No users yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Recent Login Activity</h6>
+      <table class="table table-sm">
+        <thead><tr><th>IP</th><th>Device</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for a in recent_logins %}
+          <tr><td class="small">{{ a.ip_address }}</td><td class="small text-truncate" style="max-width:150px;">{{ a.user_agent }}</td>
+              <td class="small">{{ a.created_at.strftime('%d %b %H:%M') }}</td></tr>
+          {% else %}
+          <tr><td colspan="3" class="text-center text-muted py-3">No login activity yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

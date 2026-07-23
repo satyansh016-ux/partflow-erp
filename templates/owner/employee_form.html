@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Add Employee - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Add Employee</h1></div>
+<div class="pf-card" style="max-width:600px;">
+  <form method="POST">
+    <label class="form-label small fw-semibold">Full Name *</label>
+    <input type="text" name="name" class="form-control mb-3" required>
+    <label class="form-label small fw-semibold">Email (login) *</label>
+    <input type="email" name="email" class="form-control mb-3" required>
+    <label class="form-label small fw-semibold">Phone</label>
+    <input type="text" name="phone" class="form-control mb-3">
+    <label class="form-label small fw-semibold">Password *</label>
+    <input type="password" name="password" class="form-control mb-3" required minlength="8">
+    <label class="form-label small fw-semibold">Monthly Salary (Rs.)</label>
+    <input type="number" step="0.01" name="monthly_salary" class="form-control mb-3">
+    <button class="btn btn-pf-primary">Add Employee</button>
+    <a href="{{ url_for('owner.employees') }}" class="btn btn-outline-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

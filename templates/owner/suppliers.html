@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Suppliers - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Suppliers</h1>
+  <a href="{{ url_for('owner.new_supplier') }}" class="btn btn-pf-accent"><i class="bi bi-plus-lg"></i> Add Supplier</a>
+</div>
+<div class="pf-card">
+  <table class="table table-pf table-sm align-middle">
+    <thead><tr><th>Name</th><th>Phone</th><th>GST No.</th><th>Due</th><th></th></tr></thead>
+    <tbody>
+      {% for s in suppliers %}
+      <tr>
+        <td><strong>{{ s.name }}</strong></td><td>{{ s.phone or '-' }}</td><td>{{ s.gst_number or '-' }}</td>
+        <td class="{{ 'text-danger fw-semibold' if s.total_due() > 0 }}">Rs. {{ "%.2f"|format(s.total_due()) }}</td>
+        <td class="text-end"><a href="{{ url_for('owner.supplier_detail', supplier_id=s.id) }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted py-4">No suppliers yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

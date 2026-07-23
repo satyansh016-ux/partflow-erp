@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as m %}
+{% block title %}Inventory - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Inventory</h1>
+  <a href="{{ url_for('owner.new_part') }}" class="btn btn-pf-accent"><i class="bi bi-plus-lg"></i> Add Part</a>
+</div>
+
+<div class="pf-card mb-3">
+  <form class="row g-2" method="GET">
+    <div class="col-md-8">
+      <input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search by part name, OEM number, brand, model, category...">
+    </div>
+    <div class="col-md-3">
+      <select name="vehicle_type" class="form-select">
+        <option value="">All Vehicle Types</option>
+        {% for vt in ['bike','car','truck','bus','tractor','jcb','heavy_vehicle'] %}
+          <option value="{{ vt }}" {{ 'selected' if vehicle_type == vt }}>{{ vt.replace('_',' ').title() }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="col-md-1"><button class="btn btn-pf-primary w-100"><i class="bi bi-search"></i></button></div>
+  </form>
+</div>
+
+<div class="pf-card">
+  <div class="table-responsive">
+    <table class="table table-pf table-sm align-middle">
+      <thead>
+        <tr>
+          <th>Part</th><th>OEM No.</th><th>Vehicle</th><th>Brand</th><th>Stock</th>
+          <th>Status</th><th>Selling Price</th><th>Rack</th><th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for p in parts %}
+        <tr>
+          <td><strong>{{ p.name }}</strong><br><span class="text-muted small">{{ p.category or '' }}</span></td>
+          <td class="small">{{ p.oem_number or '-' }}</td>
+          <td class="small">{{ (p.vehicle_type or '-').replace('_',' ').title() }}<br>{{ p.vehicle_model or '' }}</td>
+          <td class="small">{{ p.brand or '-' }}</td>
+          <td>{{ p.current_stock }} <span class="text-muted small">/ min {{ p.minimum_stock }}</span></td>
+          <td>{{ m.stock_badge(p.stock_level()) }}</td>
+          <td>Rs. {{ "%.2f"|format(p.selling_price) }}</td>
+          <td class="small">{{ p.rack_location or '-' }}</td>
+          <td class="text-end">
+            <a href="{{ url_for('owner.edit_part', part_id=p.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-pencil"></i></a>
+            <a href="{{ url_for('owner.part_history', part_id=p.id) }}" class="btn btn-sm btn-outline-secondary"><i class="bi bi-clock-history"></i></a>
+          </td>
+        </tr>
+        {% else %}
+        <tr><td colspan="9" class="text-center text-muted py-4">No parts found.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Stock Movement Report - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Stock Movement Report (last 90 days)</h1></div>
+
+<div class="row g-3">
+  <div class="col-lg-4">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3 text-success"><i class="bi bi-lightning-charge"></i> Fast Moving</h6>
+      <table class="table table-sm">
+        <thead><tr><th>Part</th><th>Sold</th></tr></thead>
+        <tbody>
+          {% for p, qty in fast_moving %}<tr><td>{{ p.name }}</td><td>{{ qty }}</td></tr>
+          {% else %}<tr><td colspan="2" class="text-muted small text-center py-3">None</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:#B45309;"><i class="bi bi-hourglass-split"></i> Slow Moving</h6>
+      <table class="table table-sm">
+        <thead><tr><th>Part</th><th>Sold</th></tr></thead>
+        <tbody>
+          {% for p, qty in slow_moving %}<tr><td>{{ p.name }}</td><td>{{ qty }}</td></tr>
+          {% else %}<tr><td colspan="2" class="text-muted small text-center py-3">None</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3 text-danger"><i class="bi bi-box-seam"></i> Dead Stock (no sales)</h6>
+      <table class="table table-sm">
+        <thead><tr><th>Part</th><th>In Stock</th></tr></thead>
+        <tbody>
+          {% for p in dead_stock %}<tr><td>{{ p.name }}</td><td>{{ p.current_stock }}</td></tr>
+          {% else %}<tr><td colspan="2" class="text-muted small text-center py-3">None</td></tr>{% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

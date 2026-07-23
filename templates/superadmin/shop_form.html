@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Add Shop - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Onboard New Shop</h1></div>
+<div class="pf-card" style="max-width:700px;">
+  <form method="POST">
+    <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Shop Details</h6>
+    <div class="row g-3 mb-3">
+      <div class="col-md-6">
+        <label class="form-label small fw-semibold">Shop Name *</label>
+        <input type="text" name="name" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small fw-semibold">GST Number</label>
+        <input type="text" name="gst_number" class="form-control">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small fw-semibold">Phone</label>
+        <input type="text" name="phone" class="form-control">
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small fw-semibold">Trial Period (days)</label>
+        <input type="number" name="trial_days" class="form-control" value="14">
+      </div>
+    </div>
+
+    <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Shop Owner Login</h6>
+    <div class="row g-3">
+      <div class="col-md-6">
+        <label class="form-label small fw-semibold">Owner Name *</label>
+        <input type="text" name="owner_name" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small fw-semibold">Owner Email *</label>
+        <input type="email" name="owner_email" class="form-control" required>
+      </div>
+      <div class="col-md-6">
+        <label class="form-label small fw-semibold">Owner Password *</label>
+        <input type="password" name="owner_password" class="form-control" required minlength="8">
+      </div>
+    </div>
+
+    <p class="text-muted small mt-3 mb-0"><i class="bi bi-info-circle"></i> One subscription = one shop only. This owner login will be scoped to this shop and cannot access other shops.</p>
+
+    <div class="mt-4">
+      <button class="btn btn-pf-primary">Create Shop</button>
+      <a href="{{ url_for('superadmin.shops') }}" class="btn btn-outline-secondary">Cancel</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

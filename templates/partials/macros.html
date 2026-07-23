@@ -1,0 +1,28 @@
+{% macro stat_card(label, value, color="") %}
+<div class="pf-card pf-stat-card">
+  <span class="label">{{ label }}</span>
+  <span class="value {{ color }}">{{ value }}</span>
+</div>
+{% endmacro %}
+
+{% macro stock_badge(level) %}
+  {% if level == 'critical' %}
+    <span class="badge badge-critical">Critical</span>
+  {% elif level == 'low' %}
+    <span class="badge badge-low">Low</span>
+  {% elif level == 'near_min' %}
+    <span class="badge badge-near-min">Near Min</span>
+  {% else %}
+    <span class="badge badge-ok">OK</span>
+  {% endif %}
+{% endmacro %}
+
+{% macro payment_badge(status) %}
+  {% if status == 'paid' %}
+    <span class="badge badge-ok">Paid</span>
+  {% elif status == 'partial' %}
+    <span class="badge badge-near-min">Partial</span>
+  {% else %}
+    <span class="badge badge-critical">Credit</span>
+  {% endif %}
+{% endmacro %}

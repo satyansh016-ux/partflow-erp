@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+{% block title %}Receive Purchase - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Receive Purchase</h1></div>
+<p class="text-muted small mb-3">Stock only increases here — after material is physically received. Approving a purchase request does not add stock.</p>
+
+<form method="POST">
+  <div class="row g-3">
+    <div class="col-lg-8">
+      <div class="pf-card mb-3">
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Supplier *</label>
+            <select name="supplier_id" class="form-select" required>
+              <option value="">Select supplier...</option>
+              {% for s in suppliers %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label small fw-semibold">Supplier Invoice Number</label>
+            <input type="text" name="invoice_number" class="form-control">
+          </div>
+          {% if approved_requests %}
+          <div class="col-md-12">
+            <label class="form-label small fw-semibold">Link to Approved Purchase Request (optional)</label>
+            <select name="purchase_request_id" class="form-select">
+              <option value="">-- None --</option>
+              {% for pr in approved_requests %}
+                <option value="{{ pr.id }}">{{ pr.part.name }} — Qty {{ pr.quantity }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <div class="pf-card">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h6 class="fw-bold mb-0" style="color:var(--pf-navy);">Items Received</h6>
+          <button type="button" class="btn btn-sm btn-pf-accent" onclick="addRow()"><i class="bi bi-plus-lg"></i> Add Item</button>
+        </div>
+        <div id="itemRows"></div>
+      </div>
+    </div>
+
+    <div class="col-lg-4">
+      <div class="pf-card">
+        <button type="submit" class="btn btn-pf-primary w-100 btn-lg">Confirm Receipt & Update Stock</button>
+        <a href="{{ url_for('owner.inventory') }}" class="btn btn-outline-secondary w-100 mt-2">Cancel</a>
+      </div>
+    </div>
+  </div>
+</form>
+
+<template id="rowTemplate">
+  <div class="row g-2 mb-2 item-row">
+    <div class="col-4">
+      <select name="part_id[]" class="form-select form-select-sm" required>
+        <option value="">Select part...</option>
+        {% for p in parts %}<option value="{{ p.id }}" data-price="{{ p.purchase_price }}" data-gst="{{ p.gst_percent }}">{{ p.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-2"><input type="number" name="quantity[]" class="form-control form-control-sm" placeholder="Qty" min="1" required></div>
+    <div class="col-2"><input type="number" step="0.01" name="purchase_price[]" class="form-control form-control-sm" placeholder="Price/unit" required></div>
+    <div class="col-2"><input type="number" step="0.01" name="gst_percent[]" class="form-control form-control-sm" placeholder="GST %" value="18"></div>
+    <div class="col-1"><button type="button" class="btn btn-sm btn-outline-danger" onclick="this.closest('.item-row').remove()"><i class="bi bi-trash"></i></button></div>
+  </div>
+</template>
+{% endblock %}
+
+{% block scripts %}
+<script>
+function addRow() {
+  const tpl = document.getElementById('rowTemplate');
+  document.getElementById('itemRows').appendChild(tpl.content.cloneNode(true));
+}
+document.addEventListener('change', function(e) {
+  if (e.target.matches('select[name="part_id[]"]')) {
+    const opt = e.target.options[e.target.selectedIndex];
+    const row = e.target.closest('.item-row');
+    row.querySelector('input[name="purchase_price[]"]').value = opt.getAttribute('data-price') || '';
+    row.querySelector('input[name="gst_percent[]"]').value = opt.getAttribute('data-gst') || 18;
+  }
+});
+addRow();
+</script>
+{% endblock %}

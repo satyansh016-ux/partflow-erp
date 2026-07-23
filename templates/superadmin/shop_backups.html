@@ -1,0 +1,85 @@
+{% extends "base.html" %}
+{% block title %}{{ shop.name }} - Backups{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>{{ shop.name }} — Backups</h1>
+  <form method="POST" action="{{ url_for('superadmin.run_backup_now', backup_type='manual') }}">
+    <input type="hidden" name="shop_id" value="{{ shop.id }}">
+    <button class="btn btn-pf-accent"><i class="bi bi-cloud-arrow-up"></i> Backup This Shop Now</button>
+  </form>
+</div>
+
+<div class="pf-card mb-3">
+  <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Backup History</h6>
+  <table class="table table-pf table-sm align-middle">
+    <thead><tr><th>Type</th><th>Status</th><th>Records</th><th>Size</th><th>Date</th><th></th></tr></thead>
+    <tbody>
+      {% for log in logs %}
+      <tr>
+        <td class="text-capitalize">{{ log.backup_type }}</td>
+        <td><span class="badge {{ 'badge-ok' if log.status == 'success' else 'badge-critical' }}">{{ log.status.title() }}</span></td>
+        <td class="small">
+          {% if log.table_counts %}
+            {% set counts = log.table_counts | from_json %}
+            {{ counts.values() | sum }} rows
+          {% endif %}
+        </td>
+        <td class="small">{{ '%.1f KB'|format(log.size_bytes / 1024) if log.size_bytes else '-' }}</td>
+        <td class="small">{{ log.started_at.strftime('%d %b %Y %H:%M') }}</td>
+        <td class="text-end">
+          {% if log.status == 'success' %}
+          <form method="POST" action="{{ url_for('superadmin.verify_backup', backup_id=log.id) }}" class="d-inline">
+            <button class="btn btn-sm btn-outline-secondary">Verify Integrity</button>
+          </form>
+          <button class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#restoreModal{{ log.id }}">Restore</button>
+          {% else %}
+          <span class="small text-danger" title="{{ log.error_message }}">{{ log.error_message }}</span>
+          {% endif %}
+        </td>
+      </tr>
+
+      {% if log.status == 'success' %}
+      <div class="modal fade" id="restoreModal{{ log.id }}" tabindex="-1">
+        <div class="modal-dialog"><div class="modal-content">
+          <form method="POST" action="{{ url_for('superadmin.restore_backup', shop_id=shop.id, backup_id=log.id) }}">
+            <div class="modal-header">
+              <h5 class="modal-title text-danger"><i class="bi bi-exclamation-triangle"></i> Restore {{ shop.name }}?</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p>This will <strong>permanently replace</strong> all current data for <strong>{{ shop.name }}</strong>
+                 with the backup taken on {{ log.started_at.strftime('%d %b %Y %H:%M') }}. Other shops are
+                 completely unaffected. This cannot be undone.</p>
+              <label class="form-label small fw-semibold">Type the shop name exactly to confirm: <code>{{ shop.name }}</code></label>
+              <input type="text" name="confirm_text" class="form-control" required>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-danger">I understand — Restore Now</button>
+            </div>
+          </form>
+        </div></div>
+      </div>
+      {% endif %}
+      {% else %}
+      <tr><td colspan="6" class="text-center text-muted py-4">No backups yet for this shop.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+
+<div class="pf-card">
+  <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Restore History</h6>
+  <table class="table table-sm">
+    <thead><tr><th>Date</th><th>Status</th><th>Restored By</th></tr></thead>
+    <tbody>
+      {% for r in restores %}
+      <tr><td class="small">{{ r.created_at.strftime('%d %b %Y %H:%M') }}</td>
+          <td><span class="badge {{ 'badge-ok' if r.status == 'success' else 'badge-critical' }}">{{ r.status.title() }}</span></td>
+          <td class="small">User #{{ r.restored_by }}</td></tr>
+      {% else %}
+      <tr><td colspan="3" class="text-center text-muted py-3">No restores performed.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

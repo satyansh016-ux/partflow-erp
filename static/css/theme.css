@@ -1,0 +1,112 @@
+:root {
+  --pf-navy: #0B2447;
+  --pf-navy-light: #14356b;
+  --pf-orange: #F97316;
+  --pf-orange-dark: #C2410C;
+  --pf-green: #16A34A;
+  --pf-yellow: #EAB308;
+  --pf-red: #DC2626;
+  --pf-bg: #F4F6F9;
+  --pf-card: #FFFFFF;
+  --pf-text: #1F2937;
+  --pf-muted: #6B7280;
+  --pf-border: #E5E7EB;
+}
+
+body {
+  background: var(--pf-bg);
+  color: var(--pf-text);
+  font-family: "Segoe UI", -apple-system, BlinkMacSystemFont, sans-serif;
+}
+
+/* --- Sidebar --- */
+.pf-sidebar {
+  background: var(--pf-navy);
+  min-height: 100vh;
+  width: 250px;
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  overflow-y: auto;
+  z-index: 1030;
+}
+.pf-sidebar .brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 20px 18px;
+  border-bottom: 1px solid rgba(255,255,255,0.1);
+}
+.pf-sidebar .brand img { width: 36px; height: 36px; }
+.pf-sidebar .brand span { color: #fff; font-weight: 700; font-size: 1.1rem; letter-spacing: .3px; }
+.pf-sidebar .nav-link {
+  color: rgba(255,255,255,0.75);
+  padding: 11px 18px;
+  font-size: 0.92rem;
+  border-left: 3px solid transparent;
+  display: flex; align-items: center; gap: 10px;
+}
+.pf-sidebar .nav-link:hover { background: rgba(255,255,255,0.06); color: #fff; }
+.pf-sidebar .nav-link.active {
+  background: rgba(249,115,22,0.15);
+  border-left-color: var(--pf-orange);
+  color: #fff;
+  font-weight: 600;
+}
+.pf-sidebar .nav-section-title {
+  color: rgba(255,255,255,0.4);
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  padding: 16px 18px 6px;
+}
+
+.pf-main { margin-left: 250px; padding: 22px 26px 60px; }
+
+.pf-topbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 22px; flex-wrap: wrap; gap: 10px;
+}
+.pf-topbar h1 { font-size: 1.4rem; font-weight: 700; color: var(--pf-navy); margin: 0; }
+
+/* --- Cards --- */
+.pf-card {
+  background: var(--pf-card);
+  border: 1px solid var(--pf-border);
+  border-radius: 14px;
+  padding: 18px 20px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+}
+.pf-stat-card { display: flex; flex-direction: column; gap: 4px; }
+.pf-stat-card .label { color: var(--pf-muted); font-size: 0.82rem; font-weight: 600; text-transform: uppercase; letter-spacing: .3px; }
+.pf-stat-card .value { font-size: 1.7rem; font-weight: 700; color: var(--pf-navy); }
+.pf-stat-card .value.orange { color: var(--pf-orange-dark); }
+.pf-stat-card .value.green { color: var(--pf-green); }
+.pf-stat-card .value.red { color: var(--pf-red); }
+.pf-stat-card .value.yellow { color: #B45309; }
+
+/* --- Buttons --- */
+.btn-pf-primary { background: var(--pf-navy); border-color: var(--pf-navy); color: #fff; font-weight: 600; }
+.btn-pf-primary:hover { background: var(--pf-navy-light); border-color: var(--pf-navy-light); color: #fff; }
+.btn-pf-accent { background: var(--pf-orange); border-color: var(--pf-orange); color: #fff; font-weight: 600; }
+.btn-pf-accent:hover { background: var(--pf-orange-dark); border-color: var(--pf-orange-dark); color: #fff; }
+
+/* --- Badges for stock levels --- */
+.badge-critical { background: var(--pf-red); color: #fff; }
+.badge-low { background: var(--pf-orange); color: #fff; }
+.badge-near-min { background: var(--pf-yellow); color: #1F2937; }
+.badge-ok { background: var(--pf-green); color: #fff; }
+
+.table-pf thead th { background: var(--pf-navy); color: #fff; font-size: .82rem; border: none; }
+.table-pf tbody tr:hover { background: #FAFBFC; }
+
+.pf-login-wrap {
+  min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(135deg, var(--pf-navy) 0%, #071731 100%);
+}
+.pf-login-card { background: #fff; border-radius: 16px; padding: 40px; width: 100%; max-width: 400px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+
+@media (max-width: 900px) {
+  .pf-sidebar { transform: translateX(-100%); transition: transform .2s ease; }
+  .pf-sidebar.show { transform: translateX(0); }
+  .pf-main { margin-left: 0; padding: 16px; }
+}

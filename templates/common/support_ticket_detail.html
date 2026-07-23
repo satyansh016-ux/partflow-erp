@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Ticket #{{ ticket.id }} - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Ticket #{{ ticket.id }}: {{ ticket.subject }}</h1>
+  <a href="{{ url_for('common.support_tickets') }}" class="btn btn-outline-secondary">Back</a>
+</div>
+
+<div class="pf-card mb-3">
+  <div class="d-flex gap-2 mb-2">
+    <span class="badge bg-secondary text-capitalize">{{ ticket.category.replace('_',' ') }}</span>
+    <span class="badge {{ 'badge-ok' if ticket.status == 'resolved' else 'badge-near-min' if ticket.status == 'open' else 'badge-low' if ticket.status == 'in_progress' else 'bg-secondary' }}">
+      {{ ticket.status.replace('_',' ').title() }}
+    </span>
+  </div>
+  <p>{{ ticket.description }}</p>
+  {% if ticket.screenshot_path %}
+  <img src="{{ url_for('common.support_screenshot', filename=ticket.screenshot_path) }}" class="img-fluid rounded border" style="max-width:400px;" alt="Screenshot">
+  {% endif %}
+  <p class="text-muted small mt-2 mb-0">Raised by {{ ticket.raiser.name }} on {{ ticket.created_at.strftime('%d %b %Y %H:%M') }}</p>
+</div>
+
+<div class="pf-card mb-3">
+  <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Conversation</h6>
+  {% for r in ticket.replies %}
+  <div class="mb-3 {{ 'text-end' if not r.is_admin_reply }}">
+    <div class="d-inline-block p-2 rounded {{ 'bg-primary text-white' if r.is_admin_reply else 'bg-light' }}" style="max-width:80%;">
+      <div class="small fw-semibold">{{ 'PartFlow Support' if r.is_admin_reply else r.user.name if r.user else 'You' }}</div>
+      <div>{{ r.message }}</div>
+      <div class="small {{ 'text-white-50' if r.is_admin_reply else 'text-muted' }}">{{ r.created_at.strftime('%d %b %H:%M') }}</div>
+    </div>
+  </div>
+  {% else %}
+  <p class="text-muted small">No replies yet.</p>
+  {% endfor %}
+</div>
+
+<div class="pf-card">
+  <form method="POST" action="{{ url_for('common.reply_ticket', ticket_id=ticket.id) }}">
+    <textarea name="message" class="form-control mb-2" rows="2" placeholder="Add more details..." required></textarea>
+    <button class="btn btn-pf-primary">Send Reply</button>
+  </form>
+</div>
+{% endblock %}

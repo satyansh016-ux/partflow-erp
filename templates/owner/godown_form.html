@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Add Godown - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Add Godown</h1></div>
+<div class="pf-card" style="max-width:600px;">
+  <form method="POST">
+    <label class="form-label small fw-semibold">Godown Name *</label>
+    <input type="text" name="name" class="form-control mb-3" required placeholder="e.g. Wardha Road Godown">
+    <label class="form-label small fw-semibold">Address</label>
+    <textarea name="address" class="form-control mb-3" rows="2"></textarea>
+    <button class="btn btn-pf-primary">Add Godown</button>
+    <a href="{{ url_for('owner.godowns') }}" class="btn btn-outline-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

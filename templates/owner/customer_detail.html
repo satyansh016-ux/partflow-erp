@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as m %}
+{% block title %}{{ customer.name }} - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>{{ customer.name }}</h1>
+  {% if whatsapp_url %}
+  <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success"><i class="bi bi-whatsapp"></i> Share Statement on WhatsApp</a>
+  {% endif %}
+</div>
+
+<div class="pf-card mb-3">
+  <form class="row g-2 align-items-end" method="GET">
+    <div class="col-md-4"><label class="form-label small">From</label><input type="date" name="from" value="{{ date_from }}" class="form-control"></div>
+    <div class="col-md-4"><label class="form-label small">To</label><input type="date" name="to" value="{{ date_to }}" class="form-control"></div>
+    <div class="col-md-2"><button class="btn btn-pf-primary w-100">Filter</button></div>
+  </form>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-8">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Invoice History</h6>
+      <table class="table table-pf table-sm">
+        <thead><tr><th>Invoice #</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
+        <tbody>
+          {% for inv in invoices %}
+          <tr>
+            <td><a href="{{ url_for('owner.invoice_detail', invoice_id=inv.id) }}">{{ inv.invoice_number }}</a></td>
+            <td class="small">{{ inv.created_at.strftime('%d %b %Y') }}</td>
+            <td>Rs. {{ "%.2f"|format(inv.grand_total) }}</td>
+            <td>{{ m.payment_badge(inv.payment_status) }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="text-center text-muted py-3">No invoices found.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-lg-4">
+    <div class="pf-card text-center">
+      <span class="text-muted small">Remaining Due</span>
+      <div class="fs-3 fw-bold text-danger">Rs. {{ "%.2f"|format(customer.total_due()) }}</div>
+    </div>
+  </div>
+</div>
+{% endblock %}

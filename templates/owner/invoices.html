@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as m %}
+{% block title %}Invoices - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Invoices</h1>
+  <a href="{{ url_for('owner.new_sale') }}" class="btn btn-pf-accent"><i class="bi bi-plus-lg"></i> New Sale</a>
+</div>
+
+<div class="pf-card">
+  <div class="table-responsive">
+    <table class="table table-pf table-sm align-middle">
+      <thead><tr><th>Invoice #</th><th>Date</th><th>Customer</th><th>Vehicle</th><th>Amount</th><th>Status</th><th></th></tr></thead>
+      <tbody>
+        {% for inv in invoices %}
+        <tr class="{{ 'text-decoration-line-through text-muted' if inv.is_void }}">
+          <td><strong>{{ inv.invoice_number }}</strong></td>
+          <td class="small">{{ inv.created_at.strftime('%d %b %Y %H:%M') }}</td>
+          <td>{{ inv.customer.name }}</td>
+          <td class="small">{{ inv.vehicle_number or '-' }}</td>
+          <td>Rs. {{ "%.2f"|format(inv.grand_total) }}</td>
+          <td>{{ m.payment_badge(inv.payment_status) }}{% if inv.is_void %} <span class="badge bg-secondary">Void</span>{% endif %}</td>
+          <td class="text-end"><a href="{{ url_for('owner.invoice_detail', invoice_id=inv.id) }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+        </tr>
+        {% else %}
+        <tr><td colspan="7" class="text-center text-muted py-4">No invoices yet.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

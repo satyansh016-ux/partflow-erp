@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Publish Update - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Publish a "What's New" Update</h1></div>
+<p class="text-muted small">This adds an article to every shop's Help Center under "What's New" and sends a notification to all shops.</p>
+
+<div class="pf-card" style="max-width:700px;">
+  <form method="POST">
+    <label class="form-label small fw-semibold">Title *</label>
+    <input type="text" name="title" class="form-control mb-3" required placeholder="e.g. New: Multi-Godown Stock Transfer">
+    <label class="form-label small fw-semibold">Content (HTML allowed) *</label>
+    <textarea name="body_html" class="form-control mb-3" rows="6" required placeholder="Describe what's new..."></textarea>
+    <button class="btn btn-pf-primary">Publish & Notify All Shops</button>
+  </form>
+</div>
+{% endblock %}

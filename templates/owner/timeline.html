@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+{% block title %}Activity Timeline - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Business Activity Timeline</h1>
+  <a href="{{ url_for('owner.timeline_export', **request.args) }}" class="btn btn-outline-secondary"><i class="bi bi-download"></i> Export CSV</a>
+</div>
+
+<div class="pf-card mb-3">
+  <form class="row g-2" method="GET">
+    <div class="col-md-2"><input type="date" name="from" value="{{ date_from }}" class="form-control" placeholder="From"></div>
+    <div class="col-md-2"><input type="date" name="to" value="{{ date_to }}" class="form-control" placeholder="To"></div>
+    <div class="col-md-2">
+      <select name="employee_id" class="form-select">
+        <option value="">All Employees</option>
+        {% for u in staff %}<option value="{{ u.id }}" {{ 'selected' if employee_id == u.id|string }}>{{ u.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="customer_id" class="form-select">
+        <option value="">All Customers</option>
+        {% for c in customers %}<option value="{{ c.id }}" {{ 'selected' if customer_id == c.id|string }}>{{ c.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2">
+      <select name="supplier_id" class="form-select">
+        <option value="">All Suppliers</option>
+        {% for s in suppliers %}<option value="{{ s.id }}" {{ 'selected' if supplier_id == s.id|string }}>{{ s.name }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-2"><button class="btn btn-pf-primary w-100">Filter</button></div>
+    <div class="col-12"><input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search activity..."></div>
+  </form>
+</div>
+
+<div class="pf-card">
+  {% set current_day = namespace(value=None) %}
+  {% for e in entries %}
+    {% set day = e.created_at.strftime('%d %b %Y') %}
+    {% if day != current_day.value %}
+      {% if not loop.first %}</div>{% endif %}
+      <h6 class="fw-bold mt-3 mb-2" style="color:var(--pf-navy);">{{ day }}</h6>
+      <div class="border-start ps-3">
+      {% set current_day.value = day %}
+    {% endif %}
+    <div class="d-flex gap-3 mb-2">
+      <span class="text-muted small" style="min-width:70px;">{{ e.created_at.strftime('%I:%M %p') }}</span>
+      <div>
+        <strong>{{ action_labels.get(e.action, e.action.replace('_',' ').title()) }}</strong>
+        {% if e.details %}<span class="text-muted"> — {{ e.details }}</span>{% endif %}
+        {% if e.user %}<span class="small text-muted"> ({{ e.user.name }})</span>{% endif %}
+      </div>
+    </div>
+  {% else %}
+  <p class="text-center text-muted py-4 mb-0">No activity found for these filters.</p>
+  {% endfor %}
+  {% if entries %}</div>{% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Support Center - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Support Center</h1>
+  <div class="d-flex gap-2">
+    {% if whatsapp_url %}
+    <a href="{{ whatsapp_url }}" target="_blank" class="btn btn-success"><i class="bi bi-whatsapp"></i> WhatsApp Support</a>
+    {% endif %}
+    <a href="mailto:{{ support_email }}" class="btn btn-outline-secondary"><i class="bi bi-envelope"></i> Email Support</a>
+  </div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Raise a Ticket</h6>
+      <form method="POST" action="{{ url_for('common.new_support_ticket') }}" enctype="multipart/form-data">
+        <label class="form-label small fw-semibold">Category *</label>
+        <select name="category" class="form-select mb-3" required>
+          {% for c in categories %}<option value="{{ c }}">{{ c.replace('_',' ').title() }}</option>{% endfor %}
+        </select>
+        <label class="form-label small fw-semibold">Subject *</label>
+        <input type="text" name="subject" class="form-control mb-3" required>
+        <label class="form-label small fw-semibold">Description *</label>
+        <textarea name="description" class="form-control mb-3" rows="4" required></textarea>
+        <label class="form-label small fw-semibold">Attach Screenshot (optional)</label>
+        <input type="file" name="screenshot" class="form-control mb-3" accept="image/*">
+        <button class="btn btn-pf-primary w-100">Submit Ticket</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Your Tickets</h6>
+      <table class="table table-pf table-sm">
+        <thead><tr><th>#</th><th>Subject</th><th>Category</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for t in tickets %}
+          <tr>
+            <td><a href="{{ url_for('common.ticket_detail', ticket_id=t.id) }}">#{{ t.id }}</a></td>
+            <td>{{ t.subject }}</td>
+            <td class="small text-capitalize">{{ t.category.replace('_',' ') }}</td>
+            <td>
+              <span class="badge {{ 'badge-ok' if t.status == 'resolved' else 'badge-near-min' if t.status == 'open' else 'badge-low' if t.status == 'in_progress' else 'bg-secondary' }}">
+                {{ t.status.replace('_',' ').title() }}
+              </span>
+            </td>
+            <td class="small text-muted">{{ t.created_at.strftime('%d %b %Y') }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-center text-muted py-4">No tickets raised yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      <p class="text-muted small mb-0">Your support history is saved permanently, even after tickets are resolved.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

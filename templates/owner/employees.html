@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Employees - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Employees</h1>
+  <a href="{{ url_for('owner.new_employee') }}" class="btn btn-pf-accent"><i class="bi bi-plus-lg"></i> Add Employee</a>
+</div>
+<div class="pf-card">
+  <table class="table table-pf table-sm align-middle">
+    <thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for e in staff %}
+      <tr>
+        <td><strong>{{ e.name }}</strong></td><td class="small">{{ e.email }}</td><td>{{ e.phone or '-' }}</td>
+        <td><span class="badge {{ 'badge-ok' if e.is_active_flag else 'badge-critical' }}">{{ 'Active' if e.is_active_flag else 'Disabled' }}</span></td>
+        <td class="text-end">
+          <a href="{{ url_for('owner.employee_activity', user_id=e.id) }}" class="btn btn-sm btn-outline-secondary">Activity</a>
+          <form method="POST" action="{{ url_for('owner.toggle_employee_active', user_id=e.id) }}" class="d-inline">
+            <button class="btn btn-sm btn-outline-{{ 'danger' if e.is_active_flag else 'success' }}">{{ 'Disable' if e.is_active_flag else 'Enable' }}</button>
+          </form>
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted py-4">No employees added yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

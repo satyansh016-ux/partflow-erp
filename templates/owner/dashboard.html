@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as m %}
+{% block title %}Dashboard - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Welcome back, {{ current_user.name }}</h1>
+  <a href="{{ url_for('owner.new_sale') }}" class="btn btn-pf-accent"><i class="bi bi-cart-plus"></i> New Sale</a>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3">{{ m.stat_card("Today Sales", "Rs. %.2f"|format(today_sales), "green") }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Today Purchase", "Rs. %.2f"|format(today_purchase_total)) }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Today's Profit", "Rs. %.2f"|format(today_profit), "orange") }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Today Bills", today_bills) }}</div>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3">{{ m.stat_card("Total Bills", total_bills) }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Low Stock Alerts", low_stock_count, "yellow") }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Critical Stock", critical_stock_count, "red") }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Employee Expenses (MTD)", "Rs. %.2f"|format(employee_expenses)) }}</div>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-6">{{ m.stat_card("Customer Due", "Rs. %.2f"|format(customer_due), "red") }}</div>
+  <div class="col-6 col-md-6">{{ m.stat_card("Supplier Due", "Rs. %.2f"|format(supplier_due), "red") }}</div>
+</div>
+
+<div class="pf-card">
+  <h6 class="fw-bold mb-3" style="color:var(--pf-navy);"><i class="bi bi-exclamation-triangle text-warning"></i> Active Stock Alerts</h6>
+  {% if active_alerts %}
+    <div class="table-responsive">
+      <table class="table table-pf table-sm align-middle">
+        <thead><tr><th>Part</th><th>Level</th><th>Raised</th></tr></thead>
+        <tbody>
+          {% for alert in active_alerts %}
+          <tr>
+            <td>{{ alert.part.name if alert.part else '—' }}</td>
+            <td>{{ m.stock_badge(alert.level.replace('near_min','near_min')) }}</td>
+            <td class="text-muted small">{{ alert.created_at.strftime('%d %b %Y %H:%M') }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-muted small mb-0">No active stock alerts. Everything is well stocked.</p>
+  {% endif %}
+</div>
+{% endblock %}

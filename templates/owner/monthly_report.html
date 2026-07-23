@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as m %}
+{% block title %}Monthly Report - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Monthly CA Report</h1>
+  <form method="GET" class="d-flex gap-2">
+    <input type="month" name="month" value="{{ month_str }}" class="form-control" onchange="this.form.submit()">
+  </form>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3">{{ m.stat_card("Total Sales", "Rs. %.2f"|format(total_sales), "green") }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("GST Collected", "Rs. %.2f"|format(total_gst)) }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Invoices", invoice_count) }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Stock Valuation", "Rs. %.2f"|format(stock_valuation), "orange") }}</div>
+</div>
+
+<div class="pf-card">
+  <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">HSN-wise GST Summary</h6>
+  <table class="table table-pf table-sm">
+    <thead><tr><th>HSN Code</th><th>Quantity</th><th>Taxable Value</th><th>GST Amount</th></tr></thead>
+    <tbody>
+      {% for hsn, data in hsn_summary.items() %}
+      <tr><td>{{ hsn }}</td><td>{{ data.qty }}</td><td>Rs. {{ "%.2f"|format(data.taxable) }}</td><td>Rs. {{ "%.2f"|format(data.gst) }}</td></tr>
+      {% else %}
+      <tr><td colspan="4" class="text-center text-muted py-3">No sales data for this month.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  <p class="text-muted small mb-0 mt-2">Export to PDF/Excel: use your browser's print-to-PDF, or ask PartFlow support for a scheduled export — programmatic PDF/Excel export hooks are in the codebase's reports module for extension.</p>
+</div>
+{% endblock %}

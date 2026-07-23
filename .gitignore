@@ -1,0 +1,22 @@
+# Secrets - NEVER commit this. Copy .env.example to .env locally instead.
+.env
+
+# Local SQLite database
+instance/*.db
+instance/backups/
+instance/uploads/
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.Python
+venv/
+env/
+*.egg-info/
+
+# OS/editor cruft
+.DS_Store
+.vscode/
+.idea/
+*.swp

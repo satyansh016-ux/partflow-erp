@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Purchase Requests - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Purchase Requests</h1></div>
+
+<ul class="nav nav-pills mb-3">
+  {% for s in ['pending','approved','rejected','received','all'] %}
+    <li class="nav-item">
+      <a class="nav-link {{ 'active' if status_filter == s }}" href="{{ url_for('owner.purchase_requests', status=s) }}">{{ s.title() }}</a>
+    </li>
+  {% endfor %}
+</ul>
+
+<div class="pf-card">
+  <table class="table table-pf table-sm align-middle">
+    <thead><tr><th>Part</th><th>Qty</th><th>Reason</th><th>Requested By</th><th>Date</th><th>Status</th><th></th></tr></thead>
+    <tbody>
+      {% for r in requests %}
+      <tr>
+        <td>{{ r.part.name }}</td><td>{{ r.quantity }}</td><td class="small">{{ r.reason or '-' }}</td>
+        <td class="small">{{ r.requester.name if r.requester else '-' }}</td>
+        <td class="small">{{ r.created_at.strftime('%d %b %Y') }}</td>
+        <td><span class="badge {{ 'badge-ok' if r.status=='approved' else 'badge-near-min' if r.status=='pending' else 'badge-critical' }}">{{ r.status.title() }}</span></td>
+        <td class="text-end">
+          {% if r.status == 'pending' %}
+          <form method="POST" action="{{ url_for('owner.decide_purchase_request', req_id=r.id) }}" class="d-inline">
+            <input type="hidden" name="decision" value="approved">
+            <button class="btn btn-sm btn-outline-success">Approve</button>
+          </form>
+          <form method="POST" action="{{ url_for('owner.decide_purchase_request', req_id=r.id) }}" class="d-inline">
+            <input type="hidden" name="decision" value="rejected">
+            <button class="btn btn-sm btn-outline-danger">Reject</button>
+          </form>
+          {% elif r.status == 'approved' %}
+            <a href="{{ url_for('owner.receive_purchase') }}" class="btn btn-sm btn-pf-accent">Receive Stock</a>
+          {% endif %}
+        </td>
+      </tr>
+      {% else %}
+      <tr><td colspan="7" class="text-center text-muted py-4">No requests here.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

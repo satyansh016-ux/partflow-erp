@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Help Center - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Help Center</h1></div>
+
+<div class="pf-card mb-4">
+  <form class="row g-2" method="GET">
+    <div class="col-md-10"><input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search help articles, FAQs..."></div>
+    <div class="col-md-2"><button class="btn btn-pf-primary w-100"><i class="bi bi-search"></i> Search</button></div>
+  </form>
+</div>
+
+{% set category_titles = {
+  'beginner': 'Beginner Guide',
+  'owner_guide': 'Owner User Guide',
+  'employee_guide': 'Employee User Guide',
+  'faq': 'Frequently Asked Questions',
+  'whats_new': "What's New"
+} %}
+
+{% for cat, articles in grouped.items() %}
+{% if articles %}
+<div class="pf-card mb-3">
+  <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">
+    {% if cat == 'whats_new' %}<i class="bi bi-stars"></i>{% elif cat == 'faq' %}<i class="bi bi-question-circle"></i>{% else %}<i class="bi bi-book"></i>{% endif %}
+    {{ category_titles.get(cat, cat.replace('_',' ').title()) }}
+  </h6>
+  <div class="list-group list-group-flush">
+    {% for a in articles %}
+    <a href="{{ url_for('common.help_article', slug=a.slug) }}" class="list-group-item list-group-item-action px-0">
+      {{ a.title }}
+      {% if a.video_url %}<span class="badge bg-secondary ms-2"><i class="bi bi-play-circle"></i> Video</span>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+</div>
+{% endif %}
+{% endfor %}
+
+{% if search_mode and not grouped %}
+<div class="pf-card text-center text-muted py-4">No articles matched "{{ q }}".</div>
+{% endif %}
+
+<div class="pf-card text-center">
+  <p class="text-muted small mb-2">Can't find what you're looking for?</p>
+  <a href="{{ url_for('common.support_tickets') }}" class="btn btn-outline-secondary">Contact Support</a>
+</div>
+{% endblock %}

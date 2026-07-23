@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Purchase Suggestions - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Smart Purchase Suggestions</h1>
+  <a href="{{ url_for('owner.receive_purchase') }}" class="btn btn-pf-accent">Receive Purchase</a>
+</div>
+<p class="text-muted small">Parts at or below minimum stock, ranked by how fast they've sold in the last 30 days.</p>
+
+<div class="pf-card">
+  <table class="table table-pf table-sm">
+    <thead><tr><th>Part</th><th>Current Stock</th><th>Minimum</th><th>Sold (30d)</th><th>Suggested Reorder Qty</th></tr></thead>
+    <tbody>
+      {% for p, velocity, suggested in suggestions %}
+      <tr>
+        <td>{{ p.name }}</td><td>{{ p.current_stock }}</td><td>{{ p.minimum_stock }}</td>
+        <td>{{ velocity }}</td><td class="fw-semibold text-primary">{{ suggested }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted py-4">No parts need reordering right now.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

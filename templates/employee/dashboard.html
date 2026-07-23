@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as m %}
+{% block title %}Dashboard - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Welcome, {{ current_user.name }}</h1>
+  <a href="{{ url_for('employee.new_sale') }}" class="btn btn-pf-accent"><i class="bi bi-cart-plus"></i> New Sale</a>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-4">{{ m.stat_card("My Bills Today", my_invoices_today|length) }}</div>
+  <div class="col-6 col-md-4">{{ m.stat_card("Today's Total", "Rs. %.2f"|format(my_invoices_today|sum(attribute='grand_total')|float), "green") }}</div>
+  <div class="col-6 col-md-4">{{ m.stat_card("Low Stock Items", low_stock_count, "yellow") }}</div>
+</div>
+
+<div class="pf-card">
+  <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">My Invoices Today</h6>
+  <table class="table table-pf table-sm">
+    <thead><tr><th>Invoice #</th><th>Customer</th><th>Amount</th><th>Status</th></tr></thead>
+    <tbody>
+      {% for inv in my_invoices_today %}
+      <tr>
+        <td>{{ inv.invoice_number }}</td><td>{{ inv.customer.name }}</td>
+        <td>Rs. {{ "%.2f"|format(inv.grand_total) }}</td><td>{{ m.payment_badge(inv.payment_status) }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="4" class="text-center text-muted py-3">No sales yet today.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

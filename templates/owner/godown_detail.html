@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block title %}{{ godown.name }} - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>{{ godown.name }}</h1>
+  <a href="{{ url_for('owner.stock_transfer') }}" class="btn btn-pf-accent"><i class="bi bi-arrow-left-right"></i> Transfer Stock</a>
+</div>
+<p class="text-muted small">{{ godown.address or '' }}</p>
+
+<div class="pf-card">
+  <table class="table table-pf table-sm">
+    <thead><tr><th>Part</th><th>Vehicle</th><th>Quantity Here</th></tr></thead>
+    <tbody>
+      {% for row in stock_rows %}
+      <tr>
+        <td>{{ row.part.name }}</td>
+        <td class="small">{{ (row.part.vehicle_type or '-').replace('_',' ').title() }} {{ row.part.vehicle_model or '' }}</td>
+        <td class="fw-semibold">{{ row.quantity }}</td>
+      </tr>
+      {% else %}
+      <tr><td colspan="3" class="text-center text-muted py-4">No stock at this godown yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

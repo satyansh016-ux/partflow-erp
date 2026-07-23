@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as m %}
+{% block title %}Daily Report - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Daily Report</h1>
+  <form method="GET" class="d-flex gap-2">
+    <input type="date" name="date" value="{{ report_date }}" class="form-control" onchange="this.form.submit()">
+  </form>
+</div>
+
+<div class="row g-3 mb-3">
+  <div class="col-6 col-md-3">{{ m.stat_card("Total Sales", "Rs. %.2f"|format(total_sales), "green") }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Total Purchase", "Rs. %.2f"|format(total_purchases)) }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Profit", "Rs. %.2f"|format(profit), "orange") }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("GST Collected", "Rs. %.2f"|format(total_gst)) }}</div>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-6">
+    <div class="pf-card mb-3">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Sales ({{ invoices|length }})</h6>
+      <table class="table table-pf table-sm">
+        <thead><tr><th>Invoice #</th><th>Customer</th><th>Amount</th></tr></thead>
+        <tbody>
+          {% for inv in invoices %}
+          <tr><td>{{ inv.invoice_number }}</td><td>{{ inv.customer.name }}</td><td>Rs. {{ "%.2f"|format(inv.grand_total) }}</td></tr>
+          {% else %}
+          <tr><td colspan="3" class="text-center text-muted py-3">No sales on this date.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Payments</h6>
+      <table class="table table-pf table-sm">
+        <thead><tr><th>Party</th><th>Direction</th><th>Amount</th><th>Method</th></tr></thead>
+        <tbody>
+          {% for pay in payments %}
+          <tr><td class="text-capitalize">{{ pay.party_type }}</td>
+              <td>{{ 'In' if pay.direction == 'in' else 'Out' }}</td>
+              <td>Rs. {{ "%.2f"|format(pay.amount) }}</td><td class="text-capitalize">{{ pay.method.replace('_',' ') }}</td></tr>
+          {% else %}
+          <tr><td colspan="4" class="text-center text-muted py-3">No payments on this date.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+  <div class="col-lg-6">
+    <div class="pf-card mb-3">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Purchases ({{ purchases|length }})</h6>
+      <table class="table table-pf table-sm">
+        <thead><tr><th>Supplier</th><th>Invoice #</th><th>Amount</th></tr></thead>
+        <tbody>
+          {% for p in purchases %}
+          <tr><td>{{ p.supplier.name }}</td><td>{{ p.invoice_number or '-' }}</td><td>Rs. {{ "%.2f"|format(p.total_amount) }}</td></tr>
+          {% else %}
+          <tr><td colspan="3" class="text-center text-muted py-3">No purchases on this date.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Stock Movement</h6>
+      <table class="table table-pf table-sm">
+        <thead><tr><th>Part</th><th>Reason</th><th>Change</th></tr></thead>
+        <tbody>
+          {% for entry in stock_movements %}
+          <tr><td>{{ entry.part.name if entry.part else '-' }}</td><td class="text-capitalize">{{ entry.reason }}</td>
+              <td class="{{ 'text-success' if entry.change_qty > 0 else 'text-danger' }}">{{ '+' if entry.change_qty > 0 }}{{ entry.change_qty }}</td></tr>
+          {% else %}
+          <tr><td colspan="3" class="text-center text-muted py-3">No stock movement on this date.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

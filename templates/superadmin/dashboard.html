@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% import "partials/macros.html" as m %}
+{% block title %}Platform Dashboard - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Platform Dashboard</h1>
+  <a href="{{ url_for('superadmin.new_shop') }}" class="btn btn-pf-accent"><i class="bi bi-plus-lg"></i> Add Shop</a>
+</div>
+
+<div class="row g-3 mb-4">
+  <div class="col-6 col-md-3">{{ m.stat_card("Total Shops", total_shops) }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Active Shops", active_shops, "green") }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Trial Shops", trial_shops, "yellow") }}</div>
+  <div class="col-6 col-md-3">{{ m.stat_card("Suspended/Banned", suspended_shops, "red") }}</div>
+</div>
+
+<div class="pf-card mb-4">
+  <h6 class="fw-bold mb-2" style="color:var(--pf-navy);">Platform Revenue (Active Subscriptions)</h6>
+  <div class="fs-3 fw-bold text-success">Rs. {{ "%.2f"|format(revenue) }}</div>
+</div>
+
+<div class="pf-card">
+  <h6 class="fw-bold mb-3" style="color:var(--pf-navy);"><i class="bi bi-shield-exclamation text-danger"></i> Suspected License Misuse</h6>
+  {% if misuse_alerts %}
+  <table class="table table-pf table-sm">
+    <thead><tr><th>Shop</th><th>Details</th><th>Date</th></tr></thead>
+    <tbody>
+      {% for a in misuse_alerts %}
+      <tr>
+        <td><a href="{{ url_for('superadmin.shop_detail', shop_id=a.entity_id) }}">Shop #{{ a.entity_id }}</a></td>
+        <td class="small">{{ a.details }}</td>
+        <td class="small">{{ a.created_at.strftime('%d %b %Y %H:%M') }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <p class="text-muted small mb-0">No misuse alerts. All subscriptions look healthy.</p>
+  {% endif %}
+</div>
+{% endblock %}

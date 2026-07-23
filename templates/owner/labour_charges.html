@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Labour Charges - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Labour / Service Charges</h1></div>
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Add Charge Type</h6>
+      <form method="POST">
+        <label class="form-label small fw-semibold">Name *</label>
+        <input type="text" name="name" class="form-control mb-3" required placeholder="e.g. Fitting Charge">
+        <label class="form-label small fw-semibold">Default Price (Rs.) *</label>
+        <input type="number" step="0.01" name="price" class="form-control mb-3" required>
+        <button class="btn btn-pf-primary w-100">Add</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="pf-card">
+      <table class="table table-pf table-sm">
+        <thead><tr><th>Name</th><th>Price</th><th></th></tr></thead>
+        <tbody>
+          {% for c in charges %}
+          <tr>
+            <td>{{ c.name }}</td><td>Rs. {{ "%.2f"|format(c.price) }}</td>
+            <td class="text-end">
+              <form method="POST" action="{{ url_for('owner.delete_labour_charge', charge_id=c.id) }}" class="d-inline">
+                <button class="btn btn-sm btn-outline-danger"><i class="bi bi-trash"></i></button>
+              </form>
+            </td>
+          </tr>
+          {% else %}
+          <tr><td colspan="3" class="text-center text-muted py-3">No labour charges defined yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

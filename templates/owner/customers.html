@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Customers - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Customers</h1></div>
+<div class="pf-card mb-3">
+  <form class="row g-2" method="GET">
+    <div class="col-md-10"><input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search name, mobile, vehicle number..."></div>
+    <div class="col-md-2"><button class="btn btn-pf-primary w-100">Search</button></div>
+  </form>
+</div>
+<div class="pf-card">
+  <table class="table table-pf table-sm align-middle">
+    <thead><tr><th>Name</th><th>Mobile</th><th>Vehicle</th><th>Due</th><th></th></tr></thead>
+    <tbody>
+      {% for c in customers %}
+      <tr>
+        <td><strong>{{ c.name }}</strong></td><td>{{ c.mobile or '-' }}</td><td>{{ c.vehicle_number or '-' }}</td>
+        <td class="{{ 'text-danger fw-semibold' if c.total_due() > 0 }}">Rs. {{ "%.2f"|format(c.total_due()) }}</td>
+        <td class="text-end"><a href="{{ url_for('owner.customer_detail', customer_id=c.id) }}" class="btn btn-sm btn-outline-secondary">View</a></td>
+      </tr>
+      {% else %}
+      <tr><td colspan="5" class="text-center text-muted py-4">No customers yet.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

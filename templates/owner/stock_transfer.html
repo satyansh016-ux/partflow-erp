@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block title %}Stock Transfer - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Transfer Stock Between Godowns</h1>
+  <a href="{{ url_for('owner.godowns') }}" class="btn btn-outline-secondary">Manage Godowns</a>
+</div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Ek Godown se Dusre Godown</h6>
+      <form method="POST" id="transferForm">
+        <label class="form-label small fw-semibold">Part *</label>
+        <select name="part_id" id="partSelect" class="form-select mb-3" required>
+          <option value="">Select part...</option>
+          {% for p in parts %}<option value="{{ p.id }}">{{ p.name }}</option>{% endfor %}
+        </select>
+
+        <label class="form-label small fw-semibold">From Godown *</label>
+        <select name="from_godown_id" id="fromGodown" class="form-select mb-1" required>
+          <option value="">Select source...</option>
+          {% for g in godowns %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}
+        </select>
+        <p class="small text-muted mb-3">Available here: <span id="availableQty">—</span></p>
+
+        <label class="form-label small fw-semibold">To Godown *</label>
+        <select name="to_godown_id" class="form-select mb-3" required>
+          <option value="">Select destination...</option>
+          {% for g in godowns %}<option value="{{ g.id }}">{{ g.name }}</option>{% endfor %}
+        </select>
+
+        <label class="form-label small fw-semibold">Quantity *</label>
+        <input type="number" name="quantity" class="form-control mb-3" min="1" required>
+
+        <label class="form-label small fw-semibold">Note</label>
+        <input type="text" name="note" class="form-control mb-3" placeholder="Optional">
+
+        <button class="btn btn-pf-primary w-100" {{ 'disabled' if godowns|length < 2 }}>Transfer Stock</button>
+        {% if godowns|length < 2 %}
+        <p class="text-muted small mt-2 mb-0">Add a second godown first — see "Manage Godowns" above.</p>
+        {% endif %}
+      </form>
+    </div>
+  </div>
+
+  <div class="col-lg-7">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Recent Transfers</h6>
+      <table class="table table-pf table-sm">
+        <thead><tr><th>Part</th><th>From</th><th>To</th><th>Qty</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for t in recent_transfers %}
+          <tr>
+            <td>{{ t.part.name }}</td>
+            <td class="small">{{ t.from_godown.name }}</td>
+            <td class="small">{{ t.to_godown.name }}</td>
+            <td class="fw-semibold">{{ t.quantity }}</td>
+            <td class="small text-muted">{{ t.created_at.strftime('%d %b %Y %H:%M') }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5" class="text-center text-muted py-4">No transfers yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+async function refreshAvailable() {
+  const partId = document.getElementById('partSelect').value;
+  const godownId = document.getElementById('fromGodown').value;
+  const label = document.getElementById('availableQty');
+  if (!partId || !godownId) { label.textContent = '—'; return; }
+  try {
+    const res = await fetch(`/owner/api/part-stock/${partId}/${godownId}`);
+    const data = await res.json();
+    label.textContent = data.available + ' units';
+  } catch (e) {
+    label.textContent = '—';
+  }
+}
+document.getElementById('partSelect').addEventListener('change', refreshAvailable);
+document.getElementById('fromGodown').addEventListener('change', refreshAvailable);
+</script>
+{% endblock %}

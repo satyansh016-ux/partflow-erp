@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Purchase Requests - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Purchase Requests</h1></div>
+
+<div class="row g-3">
+  <div class="col-lg-5">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">Request Purchase</h6>
+      <form method="POST">
+        <label class="form-label small fw-semibold">Part *</label>
+        <select name="part_id" class="form-select mb-3" required>
+          {% for p in parts %}
+            <option value="{{ p.id }}">{{ p.name }} (current stock: {{ p.current_stock }})</option>
+          {% endfor %}
+        </select>
+        <label class="form-label small fw-semibold">Quantity *</label>
+        <input type="number" name="quantity" class="form-control mb-3" required min="1">
+        <label class="form-label small fw-semibold">Preferred Supplier</label>
+        <select name="supplier_id" class="form-select mb-3">
+          <option value="">-- Any --</option>
+          {% for s in suppliers %}<option value="{{ s.id }}">{{ s.name }}</option>{% endfor %}
+        </select>
+        <label class="form-label small fw-semibold">Reason</label>
+        <textarea name="reason" class="form-control mb-3" rows="2"></textarea>
+        <button class="btn btn-pf-primary w-100">Send Request</button>
+      </form>
+    </div>
+  </div>
+  <div class="col-lg-7">
+    <div class="pf-card">
+      <h6 class="fw-bold mb-3" style="color:var(--pf-navy);">My Requests</h6>
+      <table class="table table-pf table-sm">
+        <thead><tr><th>Part</th><th>Qty</th><th>Status</th><th>Date</th></tr></thead>
+        <tbody>
+          {% for r in requests %}
+          <tr>
+            <td>{{ r.part.name }}</td><td>{{ r.quantity }}</td>
+            <td><span class="badge {{ 'badge-ok' if r.status=='approved' else 'badge-near-min' if r.status=='pending' else 'badge-critical' }}">{{ r.status.title() }}</span></td>
+            <td class="small">{{ r.created_at.strftime('%d %b %Y') }}</td>
+          </tr>
+          {% else %}
+          <tr><td colspan="4" class="text-center text-muted py-3">No requests yet.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

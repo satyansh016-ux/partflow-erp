@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% block title %}Notifications - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar">
+  <h1>Notifications {% if unread_count %}<span class="badge bg-danger">{{ unread_count }} unread</span>{% endif %}</h1>
+  <form method="POST" action="{{ url_for('common.mark_all_read') }}">
+    <button class="btn btn-outline-secondary">Mark All as Read</button>
+  </form>
+</div>
+
+<div class="pf-card mb-3">
+  <form class="row g-2" method="GET">
+    <div class="col-md-4"><input type="text" name="q" value="{{ q }}" class="form-control" placeholder="Search notifications..."></div>
+    <div class="col-md-3">
+      <select name="category" class="form-select">
+        <option value="">All Categories</option>
+        {% for c in categories %}<option value="{{ c }}" {{ 'selected' if category == c }}>{{ c.title() }}</option>{% endfor %}
+      </select>
+    </div>
+    <div class="col-md-3"><input type="date" name="date" value="{{ date_str }}" class="form-control"></div>
+    <div class="col-md-2"><button class="btn btn-pf-primary w-100">Filter</button></div>
+  </form>
+</div>
+
+<div class="pf-card">
+  <div class="list-group list-group-flush">
+    {% for n in items %}
+    <div class="list-group-item px-0 d-flex justify-content-between align-items-start {{ 'bg-light' if not n.is_read }}">
+      <div>
+        <div class="d-flex align-items-center gap-2">
+          <span class="badge bg-secondary text-capitalize">{{ n.category }}</span>
+          <strong>{{ n.title }}</strong>
+          {% if not n.is_read %}<span class="badge bg-danger">New</span>{% endif %}
+        </div>
+        {% if n.body %}<p class="small text-muted mb-1 mt-1">{{ n.body }}</p>{% endif %}
+        <span class="small text-muted">{{ n.created_at.strftime('%d %b %Y %H:%M') }}</span>
+        {% if n.link %}<a href="{{ n.link }}" class="small ms-2">View</a>{% endif %}
+      </div>
+      {% if not n.is_read %}
+      <form method="POST" action="{{ url_for('common.mark_read', notif_id=n.id) }}">
+        <button class="btn btn-sm btn-outline-secondary">Mark Read</button>
+      </form>
+      {% endif %}
+    </div>
+    {% else %}
+    <p class="text-center text-muted py-4 mb-0">No notifications found.</p>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

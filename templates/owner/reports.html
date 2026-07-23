@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block title %}Reports - PartFlow ERP{% endblock %}
+{% block content %}
+<div class="pf-topbar"><h1>Reports</h1></div>
+<div class="row g-3">
+  <div class="col-md-6 col-lg-3">
+    <a href="{{ url_for('owner.daily_report') }}" class="text-decoration-none">
+      <div class="pf-card h-100"><i class="bi bi-calendar-day fs-3 text-primary"></i>
+        <h6 class="fw-bold mt-2 mb-1" style="color:var(--pf-navy);">Daily Report</h6>
+        <p class="small text-muted mb-0">Sales, purchase, profit, GST, stock movement, payments for any day.</p></div>
+    </a>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <a href="{{ url_for('owner.monthly_report') }}" class="text-decoration-none">
+      <div class="pf-card h-100"><i class="bi bi-calendar-month fs-3 text-primary"></i>
+        <h6 class="fw-bold mt-2 mb-1" style="color:var(--pf-navy);">Monthly CA Report</h6>
+        <p class="small text-muted mb-0">Sales summary, HSN report, GST report, stock valuation.</p></div>
+    </a>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <a href="{{ url_for('owner.stock_movement_report') }}" class="text-decoration-none">
+      <div class="pf-card h-100"><i class="bi bi-graph-up-arrow fs-3 text-primary"></i>
+        <h6 class="fw-bold mt-2 mb-1" style="color:var(--pf-navy);">Stock Movement</h6>
+        <p class="small text-muted mb-0">Fast-moving, slow-moving, and dead-stock parts (90 days).</p></div>
+    </a>
+  </div>
+  <div class="col-md-6 col-lg-3">
+    <a href="{{ url_for('owner.purchase_suggestions') }}" class="text-decoration-none">
+      <div class="pf-card h-100"><i class="bi bi-lightbulb fs-3 text-primary"></i>
+        <h6 class="fw-bold mt-2 mb-1" style="color:var(--pf-navy);">Smart Purchase Suggestions</h6>
+        <p class="small text-muted mb-0">What to reorder, ranked by recent sale velocity.</p></div>
+    </a>
+  </div>
+</div>
+{% endblock %}

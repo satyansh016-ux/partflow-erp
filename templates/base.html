@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{% block title %}PartFlow ERP{% endblock %}</title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.3/font/bootstrap-icons.min.css" rel="stylesheet">
+  <link href="{{ url_for('static', filename='css/theme.css') }}" rel="stylesheet">
+</head>
+<body>
+
+{% if current_user.is_authenticated %}
+<nav class="pf-sidebar" id="pfSidebar">
+  <div class="brand">
+    <img src="{{ url_for('static', filename='img/logo.svg') }}" alt="PartFlow ERP logo">
+    <span>PartFlow ERP</span>
+  </div>
+
+  {% if current_user.is_super_admin() %}
+    <div class="nav-section-title">Platform</div>
+    <a class="nav-link {{ 'active' if request.endpoint == 'superadmin.dashboard' }}" href="{{ url_for('superadmin.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a class="nav-link {{ 'active' if request.endpoint and request.endpoint.startswith('superadmin.shop') }}" href="{{ url_for('superadmin.shops') }}"><i class="bi bi-shop"></i> Shops</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'superadmin.activity_logs' }}" href="{{ url_for('superadmin.activity_logs') }}"><i class="bi bi-clock-history"></i> Activity Logs</a>
+    <a class="nav-link {{ 'active' if request.endpoint and 'backup' in request.endpoint }}" href="{{ url_for('superadmin.backups') }}"><i class="bi bi-cloud-arrow-up"></i> Backups</a>
+    <a class="nav-link {{ 'active' if request.endpoint and 'support' in request.endpoint }}" href="{{ url_for('superadmin.support_inbox') }}"><i class="bi bi-headset"></i> Support Inbox</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'superadmin.publish_update' }}" href="{{ url_for('superadmin.publish_update') }}"><i class="bi bi-megaphone"></i> Publish Update</a>
+
+  {% elif current_user.is_owner() %}
+    <div class="nav-section-title">Overview</div>
+    <a class="nav-link {{ 'active' if request.endpoint == 'owner.dashboard' }}" href="{{ url_for('owner.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+
+    <div class="nav-section-title">Inventory</div>
+    <a class="nav-link {{ 'active' if request.endpoint and 'inventory' in request.endpoint or request.endpoint == 'owner.new_part' }}" href="{{ url_for('owner.inventory') }}"><i class="bi bi-box-seam"></i> Parts</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'owner.purchase_requests' }}" href="{{ url_for('owner.purchase_requests') }}"><i class="bi bi-clipboard-check"></i> Purchase Requests</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'owner.receive_purchase' }}" href="{{ url_for('owner.receive_purchase') }}"><i class="bi bi-box-arrow-in-down"></i> Receive Purchase</a>
+    <a class="nav-link {{ 'active' if request.endpoint and 'godown' in request.endpoint }}" href="{{ url_for('owner.godowns') }}"><i class="bi bi-building"></i> Godowns</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'owner.stock_transfer' }}" href="{{ url_for('owner.stock_transfer') }}"><i class="bi bi-arrow-left-right"></i> Stock Transfer</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'owner.suppliers' or request.endpoint == 'owner.supplier_detail' }}" href="{{ url_for('owner.suppliers') }}"><i class="bi bi-truck"></i> Suppliers</a>
+
+    <div class="nav-section-title">Sales</div>
+    <a class="nav-link {{ 'active' if request.endpoint == 'owner.new_sale' }}" href="{{ url_for('owner.new_sale') }}"><i class="bi bi-cart-plus"></i> New Sale</a>
+    <a class="nav-link {{ 'active' if request.endpoint and 'invoice' in request.endpoint }}" href="{{ url_for('owner.invoices') }}"><i class="bi bi-receipt"></i> Invoices</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'owner.customers' or request.endpoint == 'owner.customer_detail' }}" href="{{ url_for('owner.customers') }}"><i class="bi bi-people"></i> Customers</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'owner.labour_charges' }}" href="{{ url_for('owner.labour_charges') }}"><i class="bi bi-tools"></i> Labour Charges</a>
+
+    <div class="nav-section-title">Team</div>
+    <a class="nav-link {{ 'active' if request.endpoint and 'employee' in request.endpoint }}" href="{{ url_for('owner.employees') }}"><i class="bi bi-person-badge"></i> Employees</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'owner.expenses' }}" href="{{ url_for('owner.expenses') }}"><i class="bi bi-cash-stack"></i> Expenses</a>
+
+    <div class="nav-section-title">Reports</div>
+    <a class="nav-link {{ 'active' if request.endpoint and 'report' in request.endpoint }}" href="{{ url_for('owner.reports') }}"><i class="bi bi-bar-chart"></i> Reports</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'owner.timeline' }}" href="{{ url_for('owner.timeline') }}"><i class="bi bi-clock-history"></i> Activity Timeline</a>
+
+    <div class="nav-section-title">Help & Support</div>
+    <a class="nav-link {{ 'active' if request.endpoint and 'notification' in request.endpoint }}" href="{{ url_for('common.notifications') }}">
+      <i class="bi bi-bell"></i> Notifications
+      {% if unread_notifications %}<span class="badge bg-danger ms-auto">{{ unread_notifications }}</span>{% endif %}
+    </a>
+    <a class="nav-link {{ 'active' if request.endpoint and 'help' in request.endpoint }}" href="{{ url_for('common.help_center') }}"><i class="bi bi-question-circle"></i> Help Center</a>
+    <a class="nav-link {{ 'active' if request.endpoint and 'support' in request.endpoint or request.endpoint and 'ticket' in request.endpoint }}" href="{{ url_for('common.support_tickets') }}"><i class="bi bi-headset"></i> Support</a>
+
+  {% elif current_user.is_employee() %}
+    <div class="nav-section-title">Overview</div>
+    <a class="nav-link {{ 'active' if request.endpoint == 'employee.dashboard' }}" href="{{ url_for('employee.dashboard') }}"><i class="bi bi-speedometer2"></i> Dashboard</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'employee.new_sale' }}" href="{{ url_for('employee.new_sale') }}"><i class="bi bi-cart-plus"></i> New Sale</a>
+    <a class="nav-link {{ 'active' if request.endpoint and 'invoice' in request.endpoint }}" href="{{ url_for('employee.invoices') }}"><i class="bi bi-receipt"></i> My Invoices</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'employee.inventory' }}" href="{{ url_for('employee.inventory') }}"><i class="bi bi-box-seam"></i> Stock Lookup</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'employee.purchase_requests' }}" href="{{ url_for('employee.purchase_requests') }}"><i class="bi bi-clipboard-plus"></i> Purchase Requests</a>
+    <a class="nav-link {{ 'active' if request.endpoint == 'employee.customers' }}" href="{{ url_for('employee.customers') }}"><i class="bi bi-people"></i> Customers</a>
+
+    <div class="nav-section-title">Help & Support</div>
+    <a class="nav-link {{ 'active' if request.endpoint and 'notification' in request.endpoint }}" href="{{ url_for('common.notifications') }}">
+      <i class="bi bi-bell"></i> Notifications
+      {% if unread_notifications %}<span class="badge bg-danger ms-auto">{{ unread_notifications }}</span>{% endif %}
+    </a>
+    <a class="nav-link {{ 'active' if request.endpoint and 'help' in request.endpoint }}" href="{{ url_for('common.help_center') }}"><i class="bi bi-question-circle"></i> Help Center</a>
+    <a class="nav-link {{ 'active' if request.endpoint and 'support' in request.endpoint or request.endpoint and 'ticket' in request.endpoint }}" href="{{ url_for('common.support_tickets') }}"><i class="bi bi-headset"></i> Support</a>
+  {% endif %}
+
+  <div class="nav-section-title">Account</div>
+  <a class="nav-link" href="{{ url_for('auth.logout') }}"><i class="bi bi-box-arrow-right"></i> Logout</a>
+</nav>
+{% endif %}
+
+<main class="{{ 'pf-main' if current_user.is_authenticated else '' }}">
+  {% if current_user.is_authenticated %}
+  <div class="d-flex justify-content-between align-items-center d-md-none mb-3">
+    <button class="btn btn-outline-secondary btn-sm" onclick="document.getElementById('pfSidebar').classList.toggle('show')">
+      <i class="bi bi-list"></i> Menu
+    </button>
+    <span class="fw-semibold text-muted small">{{ current_user.name }} &middot; {{ current_user.role.replace('_',' ').title() }}</span>
+  </div>
+  {% endif %}
+
+  {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
+</body>
+</html>
