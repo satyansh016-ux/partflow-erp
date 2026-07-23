@@ -15,6 +15,11 @@ def notify(shop_id, category, event_type, title, body=None, link=None, user_id=N
         event_type=event_type, title=title, body=body, link=link,
     )
     db.session.add(n)
+    try:
+        from app.utils.push import send_push_for_notification
+        send_push_for_notification(n)
+    except Exception:
+        pass  # push is best-effort - never let it break the caller
     return n
 
 

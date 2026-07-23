@@ -57,6 +57,9 @@
       <i class="bi bi-bell"></i> Notifications
       {% if unread_notifications %}<span class="badge bg-danger ms-auto">{{ unread_notifications }}</span>{% endif %}
     </a>
+    <button type="button" id="pfEnablePushBtn" class="nav-link border-0 bg-transparent text-start w-100">
+      <i class="bi bi-phone-vibrate"></i> Enable Push Notifications
+    </button>
     <a class="nav-link {{ 'active' if request.endpoint and 'help' in request.endpoint }}" href="{{ url_for('common.help_center') }}"><i class="bi bi-question-circle"></i> Help Center</a>
     <a class="nav-link {{ 'active' if request.endpoint and 'support' in request.endpoint or request.endpoint and 'ticket' in request.endpoint }}" href="{{ url_for('common.support_tickets') }}"><i class="bi bi-headset"></i> Support</a>
 
@@ -74,6 +77,9 @@
       <i class="bi bi-bell"></i> Notifications
       {% if unread_notifications %}<span class="badge bg-danger ms-auto">{{ unread_notifications }}</span>{% endif %}
     </a>
+    <button type="button" id="pfEnablePushBtn" class="nav-link border-0 bg-transparent text-start w-100">
+      <i class="bi bi-phone-vibrate"></i> Enable Push Notifications
+    </button>
     <a class="nav-link {{ 'active' if request.endpoint and 'help' in request.endpoint }}" href="{{ url_for('common.help_center') }}"><i class="bi bi-question-circle"></i> Help Center</a>
     <a class="nav-link {{ 'active' if request.endpoint and 'support' in request.endpoint or request.endpoint and 'ticket' in request.endpoint }}" href="{{ url_for('common.support_tickets') }}"><i class="bi bi-headset"></i> Support</a>
   {% endif %}
@@ -108,6 +114,9 @@
 </main>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.3/js/bootstrap.bundle.min.js"></script>
+{% if current_user.is_authenticated %}
+<script src="{{ url_for('static', filename='js/push-client.js') }}"></script>
+{% endif %}
 {% block scripts %}{% endblock %}
 </body>
 </html>

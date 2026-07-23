@@ -7,7 +7,7 @@ from werkzeug.utils import secure_filename
 
 from app.extensions import db
 from app.decorators import roles_required
-from app.models import Role, HelpArticle, Notification, SupportTicket, SupportTicketReply
+from app.models import Role, HelpArticle, Notification, SupportTicket, SupportTicketReply, PushSubscription
 from app.utils.helpers import log_action
 
 common_bp = Blueprint("common", __name__)
@@ -209,3 +209,45 @@ def support_screenshot(filename):
     upload_dir = os.path.join(current_app.config["UPLOAD_DIR"], "support")
     basename = filename.split("/")[-1]
     return send_from_directory(upload_dir, basename)
+
+
+# ---------------------------------------------------------------------------
+# Web Push Notifications (real OS-level push, like WhatsApp)
+# ---------------------------------------------------------------------------
+
+@common_bp.route("/push/vapid-public-key")
+def push_vapid_public_key():
+    return {"publicKey": current_app.config.get("VAPID_PUBLIC_KEY", "")}
+
+
+@common_bp.route("/push/subscribe", methods=["POST"])
+def push_subscribe():
+    data = request.get_json(force=True, silent=True) or {}
+    endpoint = data.get("endpoint")
+    keys = data.get("keys", {})
+    if not endpoint or not keys.get("p256dh") or not keys.get("auth"):
+        return {"error": "invalid subscription"}, 400
+
+    existing = PushSubscription.query.filter_by(endpoint=endpoint).first()
+    if existing:
+        existing.user_id = current_user.id
+        existing.shop_id = current_user.shop_id
+        existing.p256dh = keys["p256dh"]
+        existing.auth = keys["auth"]
+    else:
+        db.session.add(PushSubscription(
+            user_id=current_user.id, shop_id=current_user.shop_id,
+            endpoint=endpoint, p256dh=keys["p256dh"], auth=keys["auth"],
+        ))
+    db.session.commit()
+    return {"status": "subscribed"}
+
+
+@common_bp.route("/push/unsubscribe", methods=["POST"])
+def push_unsubscribe():
+    data = request.get_json(force=True, silent=True) or {}
+    endpoint = data.get("endpoint")
+    if endpoint:
+        PushSubscription.query.filter_by(endpoint=endpoint).delete()
+        db.session.commit()
+    return {"status": "unsubscribed"}

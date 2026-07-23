@@ -652,3 +652,21 @@ class SupportTicketReply(db.Model):
     created_at = db.Column(db.DateTime, default=datetime.utcnow)
 
     user = db.relationship("User")
+
+
+# ---------------------------------------------------------------------------
+# Web Push Notifications (real OS/lock-screen push, like WhatsApp/Instagram)
+# ---------------------------------------------------------------------------
+
+class PushSubscription(db.Model):
+    """One row per browser/device a user has enabled push notifications on.
+    A user can have several (phone + laptop, etc.) - all get notified."""
+    __tablename__ = "push_subscriptions"
+
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("users.id"), nullable=False, index=True)
+    shop_id = db.Column(db.Integer, db.ForeignKey("shops.id"), nullable=True, index=True)
+    endpoint = db.Column(db.String(500), unique=True, nullable=False)
+    p256dh = db.Column(db.String(255), nullable=False)
+    auth = db.Column(db.String(255), nullable=False)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)

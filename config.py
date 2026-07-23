@@ -50,6 +50,14 @@ class Config:
     SUPPORT_EMAIL = os.environ.get("SUPPORT_EMAIL", "support@partflow.com")
     UPLOAD_DIR = os.environ.get("UPLOAD_DIR", os.path.join(basedir, "instance", "uploads"))
 
+    # --- Web Push Notifications (real OS-level push, like WhatsApp) --------
+    # Auto-generated into .env by seed.py on first run. The private key is
+    # stored with literal \n instead of real newlines so it fits on one env
+    # var line; we convert it back here.
+    VAPID_PRIVATE_KEY_PEM = os.environ.get("VAPID_PRIVATE_KEY_PEM", "").replace("\\n", "\n")
+    VAPID_PUBLIC_KEY = os.environ.get("VAPID_PUBLIC_KEY", "")
+    VAPID_CLAIM_EMAIL = os.environ.get("VAPID_CLAIM_EMAIL", "support@partflow.com")
+
     # Low-stock alert thresholds are per-part (minimum_stock field), these are dashboard color bands
     STOCK_CRITICAL_RATIO = 0.5   # stock <= 50% of minimum => RED
     STOCK_LOW_RATIO = 1.0        # stock <= 100% of minimum => ORANGE

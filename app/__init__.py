@@ -44,6 +44,14 @@ def create_app(config_class=Config):
 
     from app.auth.routes import auth_bp as root_bp  # noqa: reuse for '/' route registered there
 
+    @app.route("/sw.js")
+    def service_worker():
+        from flask import send_from_directory
+        return send_from_directory(
+            os.path.join(PROJECT_ROOT, "static", "js"), "sw.js",
+            mimetype="application/javascript",
+        )
+
     @app.errorhandler(403)
     def forbidden(e):
         return render_template("errors/error.html", code=403,
