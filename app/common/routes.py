@@ -251,3 +251,35 @@ def push_unsubscribe():
         PushSubscription.query.filter_by(endpoint=endpoint).delete()
         db.session.commit()
     return {"status": "unsubscribed"}
+
+
+@common_bp.route("/push/test")
+def push_test():
+    """Sends a real test push to the current user right now and returns a
+    JSON diagnostic - much easier to debug from a phone than digging through
+    server logs. Visit this URL while logged in to see exactly what happened."""
+    from app.models import Notification
+    from app.utils.push import send_push_for_notification
+
+    test_notification = Notification(
+        shop_id=current_user.shop_id, user_id=current_user.id,
+        category="business", event_type="push_test",
+        title="Test Push Notification", body="If you see this, push is working! 🎉",
+        link="/notifications",
+    )
+    db.session.add(test_notification)
+    db.session.flush()
+
+    result = send_push_for_notification(test_notification)
+    db.session.commit()
+
+    from app.models import PushSubscription
+    your_subscriptions = PushSubscription.query.filter_by(user_id=current_user.id).count()
+
+    return {
+        "your_user_id": current_user.id,
+        "your_subscriptions_on_this_device_and_others": your_subscriptions,
+        "push_result": result,
+        "note": "sent > 0 means a push was dispatched - check your phone now. "
+                "errors will show the exact reason if it failed.",
+    }

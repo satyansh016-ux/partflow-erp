@@ -5,7 +5,9 @@ site must be "Added to Home Screen" first (Apple's rule, not ours).
 
 This is entirely best-effort: if VAPID keys aren't configured yet, or a
 specific subscription has expired/been revoked by the user, we skip quietly
-rather than ever breaking the request that created the notification.
+rather than ever breaking the request that created the notification. Errors
+ARE logged (via print, visible in your host's log viewer) so failures are
+diagnosable without ever raising back into the caller.
 """
 import json
 from flask import current_app
@@ -16,8 +18,12 @@ from app.models import PushSubscription, User, Notification
 
 
 def send_push_for_notification(notification: Notification):
-    if not current_app.config.get("VAPID_PRIVATE_KEY_PEM"):
-        return  # push not configured yet - nothing to do
+    result = {"configured": bool(current_app.config.get("VAPID_PRIVATE_KEY_PEM")),
+              "subscriptions_found": 0, "sent": 0, "errors": []}
+
+    if not result["configured"]:
+        print("[push] Skipped: VAPID_PRIVATE_KEY_PEM not configured.")
+        return result
 
     if notification.user_id:
         subs = PushSubscription.query.filter_by(user_id=notification.user_id).all()
@@ -27,8 +33,12 @@ def send_push_for_notification(notification: Notification):
     else:
         subs = []
 
+    result["subscriptions_found"] = len(subs)
+    print(f"[push] Notification '{notification.title}' -> {len(subs)} subscription(s) found "
+          f"(user_id={notification.user_id}, shop_id={notification.shop_id})")
+
     if not subs:
-        return
+        return result
 
     payload = json.dumps({
         "title": notification.title,
@@ -48,14 +58,22 @@ def send_push_for_notification(notification: Notification):
                 vapid_private_key=current_app.config["VAPID_PRIVATE_KEY_PEM"],
                 vapid_claims={"sub": f"mailto:{current_app.config['VAPID_CLAIM_EMAIL']}"},
             )
+            print(f"[push] Sent OK to subscription id={sub.id}")
+            result["sent"] += 1
         except WebPushException as e:
+            status = e.response.status_code if e.response is not None else "?"
+            body = e.response.text if e.response is not None else str(e)
+            print(f"[push] WebPushException for subscription id={sub.id}: status={status} body={body}")
+            result["errors"].append(f"subscription {sub.id}: HTTP {status} - {body[:300]}")
             if e.response is not None and e.response.status_code in (404, 410):
                 dead_subscription_ids.append(sub.id)
-        except Exception:
-            pass  # push is best-effort - never let it break the caller
+        except Exception as e:
+            print(f"[push] Unexpected error for subscription id={sub.id}: {type(e).__name__}: {e}")
+            result["errors"].append(f"subscription {sub.id}: {type(e).__name__}: {e}")
 
     if dead_subscription_ids:
         PushSubscription.query.filter(PushSubscription.id.in_(dead_subscription_ids)).delete(
             synchronize_session=False
         )
     db.session.commit()
+    return result
