@@ -91,11 +91,21 @@
 
 <main class="{{ 'pf-main' if current_user.is_authenticated else '' }}">
   {% if current_user.is_authenticated %}
-  <div class="d-flex justify-content-between align-items-center d-md-none mb-3">
-    <button class="btn btn-outline-secondary btn-sm" onclick="document.getElementById('pfSidebar').classList.toggle('show')">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <button class="btn btn-outline-secondary btn-sm d-md-none" onclick="document.getElementById('pfSidebar').classList.toggle('show')">
       <i class="bi bi-list"></i> Menu
     </button>
-    <span class="fw-semibold text-muted small">{{ current_user.name }} &middot; {{ current_user.role.replace('_',' ').title() }}</span>
+    <span class="fw-semibold text-muted small d-none d-md-inline">{{ current_user.name }} &middot; {{ current_user.role.replace('_',' ').title() }}</span>
+    {% if not current_user.is_super_admin() %}
+    <a href="{{ url_for('common.notifications') }}" class="btn btn-outline-secondary btn-sm ms-auto position-relative" title="Notifications">
+      <i class="bi bi-bell-fill" style="color:var(--pf-orange);"></i>
+      {% if unread_notifications %}
+      <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size:0.65rem;">
+        {{ unread_notifications }}
+      </span>
+      {% endif %}
+    </a>
+    {% endif %}
   </div>
   {% endif %}
 
