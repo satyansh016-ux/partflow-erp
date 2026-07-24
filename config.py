@@ -51,10 +51,10 @@ class Config:
     UPLOAD_DIR = os.environ.get("UPLOAD_DIR", os.path.join(basedir, "instance", "uploads"))
 
     # --- Web Push Notifications (real OS-level push, like WhatsApp) --------
-    # Auto-generated into .env by seed.py on first run. The private key is
-    # stored with literal \n instead of real newlines so it fits on one env
-    # var line; we convert it back here.
-    VAPID_PRIVATE_KEY_PEM = os.environ.get("VAPID_PRIVATE_KEY_PEM", "").replace("\\n", "\n")
+    # py_vapid (used internally by pywebpush) expects the private key as a
+    # base64url-encoded DER blob - NOT a PEM string. This one clean string,
+    # single line, no special characters - safe to copy/paste anywhere.
+    VAPID_PRIVATE_KEY = os.environ.get("VAPID_PRIVATE_KEY", "")
     VAPID_PUBLIC_KEY = os.environ.get("VAPID_PUBLIC_KEY", "")
     VAPID_CLAIM_EMAIL = os.environ.get("VAPID_CLAIM_EMAIL", "support@partflow.com")
 

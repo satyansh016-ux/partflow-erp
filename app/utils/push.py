@@ -18,11 +18,11 @@ from app.models import PushSubscription, User, Notification
 
 
 def send_push_for_notification(notification: Notification):
-    result = {"configured": bool(current_app.config.get("VAPID_PRIVATE_KEY_PEM")),
+    result = {"configured": bool(current_app.config.get("VAPID_PRIVATE_KEY")),
               "subscriptions_found": 0, "sent": 0, "errors": []}
 
     if not result["configured"]:
-        print("[push] Skipped: VAPID_PRIVATE_KEY_PEM not configured.")
+        print("[push] Skipped: VAPID_PRIVATE_KEY not configured.")
         return result
 
     if notification.user_id:
@@ -55,7 +55,7 @@ def send_push_for_notification(notification: Notification):
                     "keys": {"p256dh": sub.p256dh, "auth": sub.auth},
                 },
                 data=payload,
-                vapid_private_key=current_app.config["VAPID_PRIVATE_KEY_PEM"],
+                vapid_private_key=current_app.config["VAPID_PRIVATE_KEY"],
                 vapid_claims={"sub": f"mailto:{current_app.config['VAPID_CLAIM_EMAIL']}"},
             )
             print(f"[push] Sent OK to subscription id={sub.id}")
