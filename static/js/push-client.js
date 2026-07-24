@@ -66,3 +66,30 @@ document.addEventListener('DOMContentLoaded', function () {
     pfEnablePushNotifications(btn);
   });
 });
+
+// ── LOCAL NOTIFICATIONS (no server push needed, works immediately) ──
+// Fires a real OS notification the instant an action succeeds on THIS
+// device, using the same mechanism GarageTrack uses - no VAPID keys, no
+// backend push-sending, no subscription needed. This only fires for
+// actions YOU take on THIS device (it can't notify other devices/other
+// people - that's what the real server push above is for), but it's
+// simple and always works once notification permission is granted.
+document.addEventListener('DOMContentLoaded', async function () {
+  const notifyEl = document.querySelector('[data-pf-local-notify]');
+  if (!notifyEl) return;
+  if (!('Notification' in window) || Notification.permission !== 'granted') return;
+
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    const message = notifyEl.textContent.trim().replace(/\s+/g, ' ');
+    await reg.showNotification('PartFlow ERP', {
+      body: message,
+      icon: '/static/img/logo.svg',
+      badge: '/static/img/logo.svg',
+      tag: 'pf-local-' + Date.now(),
+      vibrate: [200, 100, 200],
+    });
+  } catch (e) {
+    console.warn('Local notification failed:', e);
+  }
+});
