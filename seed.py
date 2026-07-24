@@ -207,9 +207,27 @@ tap and send.</p>
     print(f"[OK] Seeded {len(articles)} Help Center articles.")
 
 
+def apply_lightweight_migrations():
+    """db.create_all() only creates missing TABLES, never adds columns to a
+    table that already exists in production. Since this app doesn't use full
+    Flask-Migrate migrations, new columns are added here safely and
+    idempotently (checked before adding, so re-running is always harmless)."""
+    from sqlalchemy import inspect, text
+    inspector = inspect(db.engine)
+    if "parts" not in inspector.get_table_names():
+        return  # fresh database, db.create_all() already made it correctly
+
+    existing_columns = {c["name"] for c in inspector.get_columns("parts")}
+    if "unit" not in existing_columns:
+        db.session.execute(text("ALTER TABLE parts ADD COLUMN unit VARCHAR(20) DEFAULT 'pcs'"))
+        db.session.commit()
+        print("[OK] Migrated: added 'unit' column to parts table")
+
+
 def run():
     with app.app_context():
         db.create_all()
+        apply_lightweight_migrations()
 
         # --- Super Admin -------------------------------------------------------
         admin_email = app.config["SUPERADMIN_EMAIL"]

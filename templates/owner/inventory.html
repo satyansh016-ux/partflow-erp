@@ -40,7 +40,7 @@
           <td class="small">{{ p.oem_number or '-' }}</td>
           <td class="small">{{ (p.vehicle_type or '-').replace('_',' ').title() }}<br>{{ p.vehicle_model or '' }}</td>
           <td class="small">{{ p.brand or '-' }}</td>
-          <td>{{ p.current_stock }} <span class="text-muted small">/ min {{ p.minimum_stock }}</span></td>
+          <td>{{ p.current_stock }} {{ p.unit or 'pcs' }} <span class="text-muted small">/ min {{ p.minimum_stock }}</span></td>
           <td>{{ m.stock_badge(p.stock_level()) }}</td>
           <td>Rs. {{ "%.2f"|format(p.selling_price) }}</td>
           <td class="small">{{ p.rack_location or '-' }}</td>

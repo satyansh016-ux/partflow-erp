@@ -56,6 +56,14 @@
         <label class="form-label small fw-semibold">HSN Code</label>
         <input type="text" name="hsn_code" class="form-control" value="{{ part.hsn_code if part else '' }}">
       </div>
+      <div class="col-md-3">
+        <label class="form-label small fw-semibold">Unit</label>
+        <select name="unit" class="form-select">
+          {% for u in ['pcs','ltr','kg','set','pair','mtr','box'] %}
+            <option value="{{ u }}" {{ 'selected' if part and part.unit == u or (not part and u == 'pcs') }}>{{ u }}</option>
+          {% endfor %}
+        </select>
+      </div>
 
       {% if not part %}
       <div class="col-md-3">

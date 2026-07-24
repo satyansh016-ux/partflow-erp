@@ -127,6 +127,7 @@ def new_part():
             selling_price=Decimal(request.form.get("selling_price") or 0),
             gst_percent=Decimal(request.form.get("gst_percent") or 18),
             hsn_code=request.form.get("hsn_code", "").strip(),
+            unit=request.form.get("unit", "pcs"),
             minimum_stock=int(request.form.get("minimum_stock") or 5),
             rack_location=request.form.get("rack_location", "").strip(),
             supplier_id=request.form.get("supplier_id") or None,
@@ -165,6 +166,7 @@ def edit_part(part_id):
         part.selling_price = Decimal(request.form.get("selling_price") or 0)
         part.gst_percent = Decimal(request.form.get("gst_percent") or 18)
         part.hsn_code = request.form.get("hsn_code", "").strip()
+        part.unit = request.form.get("unit", "pcs")
         part.minimum_stock = int(request.form.get("minimum_stock") or 5)
         part.rack_location = request.form.get("rack_location", "").strip()
         part.supplier_id = request.form.get("supplier_id") or None

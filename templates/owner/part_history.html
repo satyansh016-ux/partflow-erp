@@ -11,7 +11,7 @@
 
 <div class="pf-card mb-3">
   <div class="row">
-    <div class="col-md-3"><span class="text-muted small">Current Stock</span><br><strong class="fs-5">{{ part.current_stock }}</strong></div>
+    <div class="col-md-3"><span class="text-muted small">Current Stock</span><br><strong class="fs-5">{{ part.current_stock }} {{ part.unit or 'pcs' }}</strong></div>
     <div class="col-md-3"><span class="text-muted small">Minimum Stock</span><br><strong class="fs-5">{{ part.minimum_stock }}</strong></div>
     <div class="col-md-3"><span class="text-muted small">Rack</span><br><strong class="fs-5">{{ part.rack_location or '-' }}</strong></div>
     <div class="col-md-3"><span class="text-muted small">Supplier</span><br><strong class="fs-5">{{ part.supplier.name if part.supplier else '-' }}</strong></div>

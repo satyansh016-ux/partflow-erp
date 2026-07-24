@@ -276,6 +276,7 @@ class Part(db.Model):
     selling_price = db.Column(db.Numeric(10, 2), default=0)
     gst_percent = db.Column(db.Numeric(5, 2), default=18)
     hsn_code = db.Column(db.String(20))
+    unit = db.Column(db.String(20), default="pcs")  # pcs/ltr/kg/set/pair/mtr/box
 
     current_stock = db.Column(db.Integer, default=0)
     minimum_stock = db.Column(db.Integer, default=5)

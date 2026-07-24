@@ -82,7 +82,7 @@
         <option value="">Select part...</option>
         {% for p in parts %}
           <option value="{{ p.id }}" data-price="{{ p.selling_price }}" data-stock="{{ p.current_stock }}">
-            {{ p.name }} ({{ p.current_stock }} in stock) — Rs. {{ "%.2f"|format(p.selling_price) }}
+            {{ p.name }} ({{ p.current_stock }} {{ p.unit or 'pcs' }} in stock) — Rs. {{ "%.2f"|format(p.selling_price) }}
           </option>
         {% endfor %}
       </select>

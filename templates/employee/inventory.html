@@ -17,7 +17,7 @@
       <tr>
         <td><strong>{{ p.name }}</strong></td>
         <td class="small">{{ (p.vehicle_type or '-').replace('_',' ').title() }} {{ p.vehicle_model or '' }}</td>
-        <td>{{ p.current_stock }}</td>
+        <td>{{ p.current_stock }} {{ p.unit or 'pcs' }}</td>
         <td>{{ m.stock_badge(p.stock_level()) }}</td>
         <td>Rs. {{ "%.2f"|format(p.selling_price) }}</td>
         <td class="small">{{ p.rack_location or '-' }}</td>
