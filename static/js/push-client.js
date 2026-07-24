@@ -29,12 +29,16 @@ async function pfEnablePushNotifications(btn) {
     }
 
     let sub = await reg.pushManager.getSubscription();
-    if (!sub) {
-      sub = await reg.pushManager.subscribe({
-        userVisibleOnly: true,
-        applicationServerKey: urlBase64ToUint8Array(publicKey),
-      });
+    if (sub) {
+      // Force a fresh subscription every time the button is clicked - an
+      // existing one might be bound to an old/mismatched VAPID public key
+      // from a prior attempt, which would silently fail every push send.
+      await sub.unsubscribe();
     }
+    sub = await reg.pushManager.subscribe({
+      userVisibleOnly: true,
+      applicationServerKey: urlBase64ToUint8Array(publicKey),
+    });
 
     await fetch('/push/subscribe', {
       method: 'POST',
@@ -44,8 +48,7 @@ async function pfEnablePushNotifications(btn) {
 
     localStorage.setItem('pf_push_enabled', '1');
     if (btn) {
-      btn.textContent = 'Notifications Enabled ✓';
-      btn.disabled = true;
+      btn.innerHTML = '<i class="bi bi-check-circle"></i> Enabled — click to re-check';
     }
   } catch (err) {
     console.error('Push subscription failed:', err);
@@ -57,8 +60,7 @@ document.addEventListener('DOMContentLoaded', function () {
   const btn = document.getElementById('pfEnablePushBtn');
   if (!btn) return;
   if (localStorage.getItem('pf_push_enabled') === '1' && Notification.permission === 'granted') {
-    btn.textContent = 'Notifications Enabled ✓';
-    btn.disabled = true;
+    btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> Re-check Push Notifications';
   }
   btn.addEventListener('click', function () {
     pfEnablePushNotifications(btn);
